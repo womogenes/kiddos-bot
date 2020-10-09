@@ -2,6 +2,7 @@
 
 import discord
 from discord.ext import commands
+from discord.utils import get
 
 import random
 import sys
@@ -22,6 +23,9 @@ if loadChatbot:
 
 import discord
 
+ordinal = lambda n: "%d%s" % (n,"tsnrhtdd"[(n//10%10!=1)*(n%10<4)*n%10::4])
+shorten = lambda x: x if len(x) < 16 else x[:13] + "..."
+
 class MyClient(discord.Client):
     
     def initialize(self):        
@@ -35,8 +39,25 @@ class MyClient(discord.Client):
             fin.close()
             
         with open("./data/point-info.json") as fin:
-            self.points = json.load(fin)
+            x = json.load(fin)
+            self.points = {"lifetime": {}, "weekly": {}}
+            for i in x["lifetime"]:
+                self.points["lifetime"][int(i)] = x["lifetime"][i]
+            for i in x["weekly"]:
+                self.points["weekly"][int(i)] = x["weekly"][i]
             fin.close()
+        
+        # Reset weekly points on a Monday.
+        if dt.now().weekday() == 4:
+            maxWeekly = 0
+            for i in self.points["weekly"]:
+                maxWeekly = max(maxWeekly, self.points["weekly"][i])
+                
+            if maxWeekly != 0:
+                for i in self.points["weekly"]:
+                    self.points["weekly"][i] = 0
+                with open("./data/point-info.json", "w") as fout:
+                    json.dump(self.points, fout, indent=2)
             
         self.question = None
         self.answers = None
@@ -46,6 +67,15 @@ class MyClient(discord.Client):
         self.botChannel = self.get_channel(762173542233407528)
         self.quoteChannel = self.get_channel(761340228450910250)
         self.leaderboardChannel = self.get_channel(763825477533302856)
+        
+        
+    async def on_ready(self):
+        """
+        This function is called when the client is ready.
+        """
+        print("Logged on as " + str(self.user) + "!")
+        self.initialize()
+        await self.send_quote()
         
         
     async def send_quote(self):
@@ -61,15 +91,11 @@ class MyClient(discord.Client):
             quotes = response.json()["contents"]["quotes"][0]
             
             # Spammy quotes!
-            msgId = await self.quoteChannel.send(f"""
-**Quote of the day:**\n
-> {quotes["quote"]}\n
-~ *{quotes["author"]}*
-""")
+            msgId = await self.quoteChannel.send(f"""**Quote of the day:**\n\n> {quotes["quote"]}\n\n~ *{quotes["author"]}*""")
 
             self.lastSent = dt.now()
             with open("./data/date-info.json", "w") as fout:
-                json.dump({ "last-visited": str(self.lastSent) }, fout, indent=4)
+                json.dump({ "last-visited": str(self.lastSent) }, fout, indent=2)
                 fout.close()
                 
     
@@ -79,9 +105,17 @@ class MyClient(discord.Client):
         
         if self.question == None or self.answered:
             self.question = f"**Trivia Question:**\n{unescape(response.json()['results'][0]['question'])}"
-            self.rightAnswer = unescape(response.json()["results"][0]["correct_answer"])
-            self.answers = [unescape(i) for i in response.json()["results"][0]["incorrect_answers"] + [self.rightAnswer]]
-            random.shuffle(self.answers)
+            self.rightAnswer = unescape(response.json()["results"][0]["correct_answer"]).strip()
+            self.answers = [unescape(i).strip() for i in response.json()["results"][0]["incorrect_answers"] + [self.rightAnswer]]
+            allNumeric = True
+            for i in self.answers:
+                allNumeric = allNumeric and i.isnumeric()
+            if allNumeric:
+                self.answers = [str(i) for i in sorted([int(j) for j in self.answers])]
+            if len(self.answers) != 2 and not allNumeric:
+                random.shuffle(self.answers)
+            if len(self.answers) == 2:
+                self.answers = ["True", "False"]
             self.answered = False
         
             # bot channel.
@@ -106,37 +140,33 @@ class MyClient(discord.Client):
             return
         
         answer = message.content[3:]
-        if answer.isdigit():
-            if int(answer) > len(self.answers) or int(answer) <= 0:
-                return
-                
+        if answer.isdigit() and 1 <= int(answer) <= len(self.answers):
             correct = self.answers[int(answer) - 1] == self.rightAnswer
-        
         else:
-            correct = self.rightAnswer.lower() == answer.lower()
+            return
             
         self.answered = True
-            
+        
+        if message.author.id not in self.points["lifetime"]:
+            self.points["lifetime"][message.author.id] = 0
+            self.points["weekly"][message.author.id] = 0
+        
         if correct:
-            if message.author.name not in self.points:
-                self.points[message.author.name] = 0
-            self.points[message.author.name] += 4
-            with open("./data/point-info.json", "w") as fout:
-                json.dump(self.points, fout)
-                fout.close()
-            await self.botChannel.send(f"Correct! 🙂 {message.author.display_name} now has {self.points[message.author.name]} points.")
-            await self.update_leaderboard()
+            self.points["lifetime"][message.author.id] += 3
+            self.points["weekly"][message.author.id] += 3
+            await self.botChannel.send(f"""Correct! 🙂 {message.author.display_name} now has **{self.points["lifetime"][message.author.id]}** points.""")
             
         else:
-            if message.author.name not in self.points:
-                self.points[message.author.name] = 0
-            self.points[message.author.name] -= 1
-            with open("./data/point-info.json", "w") as fout:
-                json.dump(self.points, fout)
-                fout.close()
-            await self.botChannel.send(f"""Sorry, {message.author.display_name} ☹ The right answer was {self.rightAnswer}.
-{message.author.display_name} now has {self.points[message.author.name]} points.""")
-            await self.update_leaderboard()
+            self.points["lifetime"][message.author.id] -= 1
+            self.points["weekly"][message.author.id] -= 1
+            await self.botChannel.send(f"""Sorry, {message.author.display_name} ☹ The right answer was **{self.rightAnswer}**.
+{message.author.display_name} now has **{self.points["lifetime"][message.author.id]}** points.""")
+        
+        with open("./data/point-info.json", "w") as fout:
+            json.dump(self.points, fout, indent=2)
+            fout.close()
+        
+        await self.update_leaderboard()
     
     
     async def clean_leaderboard(self, message):
@@ -147,13 +177,20 @@ class MyClient(discord.Client):
                 
     async def update_leaderboard(self):
         message = await self.leaderboardChannel.fetch_message(763825813182611477)
-        await message.edit(content=str(self.points))
-
-    
-    async def on_ready(self):
-        print("Logged on as " + str(self.user) + "!")
-        self.initialize()
-        await self.send_quote()
+        text = "```Rank |" + " Name".ljust(18) + "| Points | This week\n"
+        horiz = "-"
+        text += horiz * 5 + "+" + horiz * 18 + "+" + horiz * 8 + "+" + horiz * 16 + "\n"
+        s = sorted(self.points["weekly"].keys(), key=lambda x: (self.points["weekly"][x], self.points["lifetime"][x]), reverse=True)
+        
+        for i in range(len(self.points["lifetime"])):
+            user = await self.fetch_user(s[i])
+            if i == 0:
+                namePart = " " + shorten(user.display_name).ljust(17)
+            else:
+                namePart = " " + shorten(user.display_name).ljust(17)
+            text += f"{ordinal(i + 1).ljust(5)}|{namePart}| {str(self.points['lifetime'][s[i]]).ljust(7)}| {self.points['weekly'][s[i]]}\n"
+        text += "```"
+        await message.edit(content=text)
         
 
     async def on_message(self, message):
