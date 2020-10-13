@@ -39,18 +39,20 @@ class MyClient(discord.Client):
         with open("./data/trivia-info.json") as fin:
             self.triviaInfo = json.load(fin)
             fin.close()
-            
+        
         with open("./data/point-info.json") as fin:
             x = json.load(fin)
-            self.points = {"lifetime": {}, "weekly": {}}
+            self.points = {"lifetime": {}, "weekly": {}, "hitrate": {}}
             for i in x["lifetime"]:
                 self.points["lifetime"][int(i)] = x["lifetime"][i]
             for i in x["weekly"]:
                 self.points["weekly"][int(i)] = x["weekly"][i]
+            for i in x["hitrate"]:
+                self.points["hitrate"][int(i)] = x["hitrate"][i]
             fin.close()
         
         # Reset weekly points on a ?day.
-        if dt.now().weekday() == 0 and dt.strptime(dateInfo["last-reset-weekly-points"], "%Y-%m-%d %H:%M:%S.%f").date() != dt.now().date():
+        if dt.now().weekday() == 0 and dt.strptime(self.dateInfo["last-reset-weekly-points"], "%Y-%m-%d %H:%M:%S.%f").date() != dt.now().date():
             for i in self.points["weekly"]:
                 self.points["weekly"][i] = 0
             with open("./data/point-info.json", "w") as fout:
@@ -60,15 +62,15 @@ class MyClient(discord.Client):
             with open("./data/date-info.json", "w") as fout:
                 json.dump({ "last-sent-quote": str(self.lastSent) }, fout, indent=2)
                 fout.close()
-                
-            
+        
+        
+        self.questionCache = []
+        
         self.question = None
         self.answers = None
         self.rightAnswer = None
         self.answered = True
-        self.tossup = 0
-        self.lastSentTossup = 0
-        self.lastSentBonus = 0
+        self.lastSentQuestion = 0
         
         self.botChannel = self.get_channel(762173542233407528)
         self.quoteChannel = self.get_channel(761340228450910250)
@@ -83,6 +85,8 @@ class MyClient(discord.Client):
         self.initialize()
         await self.send_quote()
         await self.update_leaderboard()
+        await self.replenish_cache()
+        print("Question cache ready!")
         
     
     async def on_message(self, message):
@@ -130,21 +134,33 @@ class MyClient(discord.Client):
                 json.dump(self.dateInfo, fout, indent=2)
                 fout.close()
                 
-    
-    async def send_trivia(self):
-        url = "https://opentdb.com/api.php?amount=1"
+                
+    async def replenish_cache(self):
+        amount = max(10 - len(self.questionCache), 0)
+        url = f"https://opentdb.com/api.php?amount={amount}"
         response = requests.get(url)
         
+        self.questionCache.extend(response.json()["results"])
+        
+    
+    async def send_trivia(self):
+        await self.replenish_cache()
+        q = self.questionCache.pop(0)
+        
         if self.question == None or self.answered:
-            if self.tossup == 0:
-                self.question = "**Tossup:**"
+            diff = q["difficulty"]
+            if diff == "easy":
+                self.questionPoints = 2
+            elif diff == "medium":
+                self.questionPoints = 3
             else:
-                user = await self.fetch_user(self.tossup)
-                #self.question = f"Bonus for **{user.display_name}**:"
-                self.question = f"Bonus for **everyone:**"
-            self.question += f"\n{unescape(response.json()['results'][0]['question'])}"
-            self.rightAnswer = unescape(response.json()["results"][0]["correct_answer"]).strip()
-            self.answers = [unescape(i).strip() for i in response.json()["results"][0]["incorrect_answers"] + [self.rightAnswer]]
+                self.questionPoints = 4
+                
+            self.question = f"**Trivia question:** ({self.questionPoints} points)"
+            self.question += f"\n{unescape(q['question'])}"
+            
+            self.rightAnswer = unescape(q["correct_answer"]).strip()
+            self.answers = [unescape(i).strip() for i in q["incorrect_answers"] + [self.rightAnswer]]
             allNumeric = True
             for i in self.answers:
                 allNumeric = allNumeric and i.isnumeric()
@@ -161,18 +177,15 @@ class MyClient(discord.Client):
             for i in range(len(self.answers)):
                 self.question += f"**{i + 1}**. {unescape(self.answers[i])}\n"
             await self.botChannel.send(self.question)
-            self.lastSentTossup = time.time()
+            self.lastSentQuestion = time.time()
             
-        elif not self.answered and time.time() - self.lastSentTossup > 10:
+            await self.replenish_cache()
+            
+        elif not self.answered and time.time() - self.lastSentQuestion > 10:
             await self.botChannel.send(self.question)
             
         
-        
-    async def answer_trivia(self, message):
-        if self.tossup > 0 and message.author.id != self.tossup:
-            #return
-            pass
-    
+    async def answer_trivia(self, message):    
         if self.answered:
             #await self.botChannel.send("There is currently no active question.\nUse `-t` for a new trivia question.")
             return
@@ -191,28 +204,22 @@ class MyClient(discord.Client):
         if message.author.id not in self.points["lifetime"]:
             self.points["lifetime"][message.author.id] = 0
             self.points["weekly"][message.author.id] = 0
+            self.points["hitrate"][message.author.id] = [0, 0]
+            
+        self.points["hitrate"][message.author.id][1] += 1
         
         if correct:
-            points = 5 if self.tossup else 3
-            self.points["lifetime"][message.author.id] += points
-            self.points["weekly"][message.author.id] += points
-            await self.botChannel.send(f"""Correct! 🙂 {message.author.display_name} now has **{self.points["lifetime"][message.author.id]}** points. (+{points})""")
-            if self.tossup == 0:
-                self.answered = True
-                self.tossup = message.author.id
-                if time.time() - self.lastSentBonus > 30 and not self.answered:
-                    await self.send_trivia()
-                    self.lastSentBonus = time.time()
-            else:
-                self.tossup = 0
+            self.points["lifetime"][message.author.id] += self.questionPoints
+            self.points["weekly"][message.author.id] += self.questionPoints
+            self.points["hitrate"][message.author.id][0] += 1
+            await self.botChannel.send(f"""Correct! 🙂 {message.author.display_name} now has **{self.points["lifetime"][message.author.id]}** points. (+{self.questionPoints})""")
             
         else:
-            lostPoints = 3
-            self.points["lifetime"][message.author.id] -= 3
-            self.points["weekly"][message.author.id] -= 3
+            lostPoints = 1
+            self.points["lifetime"][message.author.id] -= lostPoints
+            self.points["weekly"][message.author.id] -= lostPoints
             await self.botChannel.send(f"""Sorry, {message.author.display_name} ☹ The right answer was **{self.rightAnswer}**.
 {message.author.display_name} now has **{self.points["lifetime"][message.author.id]}** points. (-{lostPoints})""")
-            self.tossup = 0
         
         with open("./data/point-info.json", "w") as fout:
             json.dump(self.points, fout, indent=2)
@@ -230,6 +237,7 @@ class MyClient(discord.Client):
     async def update_leaderboard(self):
         message = await self.leaderboardChannel.fetch_message(763825813182611477)
         
+        # By lifetime points.
         table1 = [["Rank", "Name", "Points"]]
         tp = sorted(self.points["lifetime"], key=lambda x: self.points["lifetime"][x], reverse=True)
         for i in range(len(tp)):
@@ -238,18 +246,40 @@ class MyClient(discord.Client):
         
         text1 = tabulate(table1, headers="firstrow", tablefmt="github", numalign="left")
         
+        # By weekly points.
         table2 = [["Rank", "Name", "Points"]]
         tw = sorted(self.points["weekly"], key=lambda x: self.points["weekly"][x], reverse=True)
         for i in range(len(tw)):
             user = await self.fetch_user(tw[i])
+            x = self.points["weekly"][tw[i]]
             table2.append([ordinal(i + 1), user.display_name, signify(self.points["weekly"][tw[i]])])
         
         text2 = tabulate(table2, headers="firstrow", tablefmt="github", numalign="left")
         
+        # By hitrate.
+        table3 = [["Rank", "Name", "Correct/Total", "Accuracy"]]
+        def hitrate(x):
+            if self.points["hitrate"][x][1] < 10:
+                return 0
+            return self.points["hitrate"][x][0] / self.points["hitrate"][x][1]
+            
+        ac = sorted(self.points["weekly"], key=hitrate, reverse=True)
+        for i in range(len(ac)):
+            user = await self.fetch_user(ac[i])
+            percent = 0 if self.points["hitrate"][user.id][1] == 0 else self.points["hitrate"][user.id][0] / self.points["hitrate"][user.id][1]
+            percentage = str(round(percent * 100, 0)) + "%"
+            outof = f"{self.points['hitrate'][user.id][0]}/{self.points['hitrate'][user.id][1]}"
+            table3.append([ordinal(i + 1), user.display_name, outof, percentage])
+        
+        text3 = tabulate(table3, headers="firstrow", tablefmt="github", numalign="left")
+        
         text = f"**Sorted by lifetime points:**\n```{text1}```\n"
-        text += f"**Sorted by this week's points:**\n```{text2}```"
+        text += f"**Sorted by this week's points:**\n```{text2}```\n"
+        text += f"**Sorted by accuracy:**\n```{text3}```"
         
         await message.edit(content=text)
+        
+        print("UPDATED LEADERBOARDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDD")
         
     
     async def teehee(self, message):
@@ -261,6 +291,9 @@ class MyClient(discord.Client):
     
     
     async def ping(self, message):
+        if "<@!762164191410520094>" in message.content:
+            await message.channel.send(f"<@{message.author.id}>\nRight back at you!")
+        
         if message.content == "ping":
             if random.randrange(10) < 1:
                 await message.channel.send(":O ponggers")
@@ -285,4 +318,4 @@ class MyClient(discord.Client):
 
 
 client = MyClient()
-client.run('NzYyMTY0MTkxNDEwNTIwMDk0.X3lKtw.Sqscgwss27OXVuAl4OJAWHQSoRE')
+client.run('NzYyMTY0MTkxNDEwNTIwMDk0.X3lKtw.rFAjDvgtGDKi5DvnSYl0HiTu96U')
