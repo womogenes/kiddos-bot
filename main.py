@@ -87,6 +87,7 @@ class MyClient(discord.Client):
         await self.update_leaderboard()
         await self.replenish_cache()
         print("Question cache ready!")
+        await self.clear_leaderboard()
         
     
     async def on_message(self, message):
@@ -226,12 +227,20 @@ class MyClient(discord.Client):
             fout.close()
         
         await self.update_leaderboard()
+        
+        
+    async def clear_leaderboard(self):
+        async for m in self.leaderboardChannel.history():
+            if m.id != 763825813182611477:
+                await m.delete()
     
     
     async def clean_leaderboard(self, message):
-        if message.channel.id == 763825477533302856:
-            if message.id != 763825813182611477:
-                await message.delete()
+        if message.channel.id != 763825477533302856:
+            return
+            
+        if message.id != 763825813182611477:
+            await message.delete()
                 
                 
     async def update_leaderboard(self):
@@ -267,7 +276,7 @@ class MyClient(discord.Client):
         for i in range(len(ac)):
             user = await self.fetch_user(ac[i])
             percent = 0 if self.points["hitrate"][user.id][1] == 0 else self.points["hitrate"][user.id][0] / self.points["hitrate"][user.id][1]
-            percentage = str(round(percent * 100, 0)) + "%"
+            percentage = str(round(percent * 100, 1)) + "%"
             outof = f"{self.points['hitrate'][user.id][0]}/{self.points['hitrate'][user.id][1]}"
             table3.append([ordinal(i + 1), user.display_name, outof, percentage])
         
@@ -283,6 +292,9 @@ class MyClient(discord.Client):
         
     
     async def teehee(self, message):
+        if message.channel.id == 763825477533302856:
+            return
+            
         # This is Minoo.
         if message.author.id == 722965611012948018 and message.channel != self.botChannel:
             if random.randrange(5) < 1:
