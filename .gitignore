@@ -1,2 +1,3 @@
-/gpt2-chatbot
+gpt2-chatbot/
 dataset_cache_OpenAIGPTTokenizer
+__pycache__/
