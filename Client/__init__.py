@@ -1,6 +1,27 @@
 import discord
+from discord.ext import commands
+from discord.utils import get
+
+import random
+import sys
+import os
+import time
+import json
+from datetime import datetime as dt
+import requests
+from pprint import pprint
+
+from html import unescape
+from tabulate import tabulate
 
 class Client(discord.Client):
+    
+    from ._on_ready import on_ready
+    from ._on_message import on_message
+    from ._send_quote import send_quote
+    from ._trivia import replenish_cache, send_trivia, answer_trivia
+    from ._leaderboard import clear_leaderboard, clean_leaderboard, update_leaderboard
+    from ._other import teehee, ping, gpt2_chat
     
     def initialize(self):
         with open("./data/date-info.json") as fin:
