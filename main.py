@@ -283,7 +283,7 @@ class MyClient(discord.Client):
         text3 = tabulate(table3, headers="firstrow", tablefmt="github", numalign="left")
         
         text = ""
-        text += f"**Sorted by accuracy:**\n```{text3}\n```"
+        text += f"**Sorted by accuracy:**\n```{text3}```\n"
         text += f"**Sorted by lifetime points:**\n```{text1}```\n"
         text += f"**Sorted by this week's points:**\n```{text2}```\n"
         text = text[:-1]
