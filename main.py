@@ -16,7 +16,11 @@ from pprint import pprint
 from html import unescape
 from tabulate import tabulate
 
-import Client
+loadChatbot = False
+if loadChatbot:
+    sys.path.append(os.getcwd() + "/gpt2-chatbot")
+    from chatbot import *
+    chatbot = Bot()
 
 import discord
 
@@ -26,6 +30,52 @@ signify = lambda x: "+" + str(x) if x > 0 else x
 
 class MyClient(discord.Client):
     
+    def initialize(self):        
+        with open("./data/date-info.json") as fin:
+            self.dateInfo = json.load(fin)
+            self.lastSent = dt.strptime(self.dateInfo["last-sent-quote"], "%Y-%m-%d %H:%M:%S.%f")
+            fin.close()
+            
+        with open("./data/trivia-info.json") as fin:
+            self.triviaInfo = json.load(fin)
+            fin.close()
+        
+        with open("./data/point-info.json") as fin:
+            x = json.load(fin)
+            self.points = {"lifetime": {}, "weekly": {}, "hitrate": {}}
+            for i in x["lifetime"]:
+                self.points["lifetime"][int(i)] = x["lifetime"][i]
+            for i in x["weekly"]:
+                self.points["weekly"][int(i)] = x["weekly"][i]
+            for i in x["hitrate"]:
+                self.points["hitrate"][int(i)] = x["hitrate"][i]
+            fin.close()
+        
+        # Reset weekly points on a ?day.
+        if dt.now().weekday() == 0 and dt.strptime(self.dateInfo["last-reset-weekly-points"], "%Y-%m-%d %H:%M:%S.%f").date() != dt.now().date():
+            for i in self.points["weekly"]:
+                self.points["weekly"][i] = 0
+            with open("./data/point-info.json", "w") as fout:
+                json.dump(self.points, fout, indent=2)
+                fout.close()
+            self.dateInfo["last-reset-weekly-points"] = str(dt.now())
+            with open("./data/date-info.json", "w") as fout:
+                json.dump({ "last-sent-quote": str(self.lastSent) }, fout, indent=2)
+                fout.close()
+        
+        
+        self.questionCache = []
+        
+        self.question = None
+        self.answers = None
+        self.rightAnswer = None
+        self.answered = True
+        self.lastSentQuestion = 0
+        
+        self.botChannel = self.get_channel(762173542233407528)
+        self.quoteChannel = self.get_channel(761340228450910250)
+        self.leaderboardChannel = self.get_channel(763825477533302856)
+        
         
     async def on_ready(self):
         """
@@ -192,7 +242,7 @@ class MyClient(discord.Client):
         if message.id != 763825813182611477:
             await message.delete()
                 
-    
+                
     async def update_leaderboard(self):
         message = await self.leaderboardChannel.fetch_message(763825813182611477)
         
@@ -232,12 +282,9 @@ class MyClient(discord.Client):
         
         text3 = tabulate(table3, headers="firstrow", tablefmt="github", numalign="left")
         
-        text = ""
-        text += f"**Sorted by accuracy:**\n```{text3}```\n"
-        text += f"**Sorted by lifetime points:**\n```{text1}```\n"
+        text = f"**Sorted by lifetime points:**\n```{text1}```\n"
         text += f"**Sorted by this week's points:**\n```{text2}```\n"
-        
-        text = text[:-1]
+        text += f"**Sorted by accuracy:**\n```{text3}```"
         
         await message.edit(content=text)
         
@@ -282,5 +329,5 @@ class MyClient(discord.Client):
 
 
 
-client = Client.Client()
+client = MyClient()
 client.run('NzYyMTY0MTkxNDEwNTIwMDk0.X3lKtw.rFAjDvgtGDKi5DvnSYl0HiTu96U')
