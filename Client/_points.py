@@ -9,6 +9,13 @@ def give_points(self, userID, points):
     
     with open("./data/point-info.json", "w") as fout:
         json.dump(self.points, fout, indent=2)
+        
+
+async def balance(self, message):
+    if message.author.id not in self.points["lifetime"]:
+        await message.channel.send(f"**{message.author.display_name}** does not have any points.")
+        
+    await message.channel.send(f"**{message.author.display_name}** has **{self.points['lifetime'][message.author.id]}** points.")
     
     
 async def donate_points(self, message):

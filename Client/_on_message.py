@@ -22,7 +22,15 @@ async def on_message(self, message):
     if text.lower().startswith("-donate "):
         await self.donate_points(message)
         return
-
+        
+    if text.lower() == "-kill" and message.author.id == 709796562733105154:
+        await self.logout(message)
+        return
+        
+    if text.lower().startswith("-balance"):
+        await self.balance(message)
+        return
+    
     await self.clean_leaderboard(message)
     if await self.teehee(message): return
     if await self.ping(message): return
