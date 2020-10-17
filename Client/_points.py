@@ -38,15 +38,18 @@ async def donate_points(self, message):
     
     if amount > self.points["lifetime"][message.author.id]:
         short = amount - self.points["lifetime"][message.author.id]
-        await message.channel.send(f"**{message.author.display_name}**, you have {self.points['lifetime'][message.author.id]} points, which is {amount} points short. :frowning2:")
+        await message.channel.send(f"**{message.author.display_name}**, you have **{self.points['lifetime'][message.author.id]}** points, which is **{amount - self.points['lifetime'][message.author.id]}** points short of **{amount}**. :frowning2:")
         return
     
     idx = int(idx)
+    try:
+        user = await self.fetch_user(idx)
+    except:
+        return
     
     self.give_points(idx, amount)
     self.give_points(message.author.id, -amount)
     
-    user = await self.fetch_user(idx)
     await message.channel.send(f"**{message.author.display_name}** now has **{self.points['lifetime'][message.author.id]}** points and **{user.display_name}** now has **{self.points['lifetime'][idx]}** points.")
     await self.update_leaderboard()
     return
