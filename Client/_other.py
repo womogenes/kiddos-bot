@@ -1,3 +1,5 @@
+import random
+
 async def teehee(self, message):
     if message.channel.id == 763825477533302856:
         return

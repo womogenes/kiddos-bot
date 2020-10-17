@@ -1,18 +1,7 @@
-import discord
-from discord.ext import commands
-from discord.utils import get
-
-import random
-import sys
-import os
 import time
 import json
 from datetime import datetime as dt
 import requests
-from pprint import pprint
-
-from html import unescape
-from tabulate import tabulate
 
 async def send_quote(self):
     if self.lastSent.date() != dt.now().date():

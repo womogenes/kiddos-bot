@@ -1,19 +1,5 @@
 from tabulate import tabulate
-import discord
-from discord.ext import commands
-from discord.utils import get
-
-import random
-import sys
-import os
 import time
-import json
-from datetime import datetime as dt
-import requests
-from pprint import pprint
-
-from html import unescape
-from tabulate import tabulate
 
 ordinal = lambda n: "%d%s" % (n,"tsnrhtdd"[(n//10%10!=1)*(n%10<4)*n%10::4])
 signify = lambda x: "+" + str(x) if x > 0 else x
@@ -33,6 +19,10 @@ async def clean_leaderboard(self, message):
             
 
 async def update_leaderboard(self):
+    if time.time() - self.lastUpdatedLeaderboard < 60:
+        return
+    self.lastUpdatedLeaderboard = time.time()
+
     message = await self.leaderboardChannel.fetch_message(763825813182611477)
     
     # By lifetime points.
@@ -80,4 +70,5 @@ async def update_leaderboard(self):
     
     await message.edit(content=text)
     
+    self.lastUpdatedLeaderboard = time.time()
     print("UPDATED LEADERBOARDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDD")

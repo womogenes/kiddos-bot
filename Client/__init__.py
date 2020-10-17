@@ -22,6 +22,8 @@ class Client(discord.Client):
     from ._trivia import replenish_cache, send_trivia, answer_trivia
     from ._leaderboard import clear_leaderboard, clean_leaderboard, update_leaderboard
     from ._other import teehee, ping, gpt2_chat
+    from ._points import give_points, donate_points
+    from ._inherited import fetch_user
     
     def initialize(self):
         with open("./data/date-info.json") as fin:
@@ -64,9 +66,9 @@ class Client(discord.Client):
         self.rightAnswer = None
         self.answered = True
         self.lastSentQuestion = 0
+        self.lastUpdatedLeaderboard = 0
         
         self.botChannel = self.get_channel(762173542233407528)
         self.quoteChannel = self.get_channel(761340228450910250)
         self.leaderboardChannel = self.get_channel(763825477533302856)
-        
-        
+        self.userCache = {}

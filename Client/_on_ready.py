@@ -1,19 +1,3 @@
-import discord
-from discord.ext import commands
-from discord.utils import get
-
-import random
-import sys
-import os
-import time
-import json
-from datetime import datetime as dt
-import requests
-from pprint import pprint
-
-from html import unescape
-from tabulate import tabulate
-
 async def on_ready(self):
     """
     This function is called when the client is ready.

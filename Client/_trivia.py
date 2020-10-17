@@ -1,15 +1,10 @@
 import discord
-from discord.ext import commands
-from discord.utils import get
 
 import random
-import sys
 import os
 import time
 import json
-from datetime import datetime as dt
 import requests
-from pprint import pprint
 
 from html import unescape
 from tabulate import tabulate
@@ -62,7 +57,7 @@ async def send_trivia(self):
         
     elif not self.answered and time.time() - self.lastSentQuestion > 10:
         await self.botChannel.send(self.question)
-            
+        
         
 async def answer_trivia(self, message):    
     if self.answered:
@@ -81,27 +76,21 @@ async def answer_trivia(self, message):
     self.answered = True
     
     if message.author.id not in self.points["lifetime"]:
-        self.points["lifetime"][message.author.id] = 0
-        self.points["weekly"][message.author.id] = 0
         self.points["hitrate"][message.author.id] = [0, 0]
         
     self.points["hitrate"][message.author.id][1] += 1
     
     if correct:
-        self.points["lifetime"][message.author.id] += self.questionPoints
-        self.points["weekly"][message.author.id] += self.questionPoints
+        await message.add_reaction("🧠")
+        self.give_points(message.author.id, self.questionPoints)
         self.points["hitrate"][message.author.id][0] += 1
-        await self.botChannel.send(f"""Correct! 🙂 {message.author.display_name} now has **{self.points["lifetime"][message.author.id]}** points. (+{self.questionPoints})""")
+        await self.botChannel.send(f"""Correct! 😀 {message.author.display_name} now has **{self.points["lifetime"][message.author.id]}** points. (+{self.questionPoints})""")
         
     else:
-        lostPoints = 1
-        self.points["lifetime"][message.author.id] -= lostPoints
-        self.points["weekly"][message.author.id] -= lostPoints
-        await self.botChannel.send(f"""Sorry, {message.author.display_name} ☹ The right answer was **{self.rightAnswer}**.
-{message.author.display_name} now has **{self.points["lifetime"][message.author.id]}** points. (-{lostPoints})""")
-    
-    with open("./data/point-info.json", "w") as fout:
-        json.dump(self.points, fout, indent=2)
-        fout.close()
+        await message.add_reaction("☹️")
+        self.lostPoints = -1
+        self.give_points(message.author.id, self.lostPoints)
+        await self.botChannel.send(f"""Sorry, {message.author.display_name} ️☹️ The right answer was **{self.rightAnswer}**.
+{message.author.display_name} now has **{self.points["lifetime"][message.author.id]}** points. ({self.lostPoints})""")
     
     await self.update_leaderboard()
