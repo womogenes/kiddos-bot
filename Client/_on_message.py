@@ -32,5 +32,6 @@ async def on_message(self, message):
         return
     
     await self.clean_leaderboard(message)
+    await self.shit(message)
     if await self.teehee(message): return
     if await self.ping(message): return
