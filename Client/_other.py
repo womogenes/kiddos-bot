@@ -1,8 +1,12 @@
 import random
 import discord
+import os
 
 async def logout(self, message):
     await message.channel.send("""These are my last words, and I am certain that my sacrifice will not be in vain. I am certain that, at the very least, it will be a moral lesson that will punish felony, cowardice and treason. 💀⚰️""")
+    os.system("git add .")
+    os.system("git commit -m 'Make sure to save the points file!'")
+    os.system("git push")
     await discord.Client.logout(self)
     
 
