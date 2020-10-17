@@ -4,6 +4,7 @@ def give_points(self, userID, points):
     if userID not in self.points["lifetime"]:
         self.points["lifetime"][userID] = 0
         self.points["weekly"][userID] = 0
+        self.points["hitrate"][userID] = [0, 0]
     self.points["lifetime"][userID] += points
     self.points["weekly"][userID] += points
     
