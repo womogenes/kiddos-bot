@@ -23,7 +23,7 @@ async def teehee(self, message):
 
 async def ping(self, message):
     if "<@!762164191410520094>" in message.content and message.channel != self.leaderboardChannel:
-        await message.channel.send(f"<@{message.author.id}>\nRight back at you!")
+        await message.channel.send(f"<@{message.author.id}>\nRight back at you!\nUse `{self.prefix}help` for help text.")
     
     if message.content == "ping":
         if random.randrange(10) < 1:

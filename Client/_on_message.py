@@ -11,24 +11,28 @@ async def on_message(self, message):
         return
         
     # Do commands!
-    if channel.id == 762173542233407528 and text.lower().strip() == "-t":
+    if channel.id == 762173542233407528 and text.lower().strip() == f"{self.prefix}t":
         await self.send_trivia()
         return
         
-    if channel.id == 762173542233407528 and text.lower().startswith("-a "):
+    if channel.id == 762173542233407528 and text.lower().startswith(f"{self.prefix}a "):
         await self.answer_trivia(message)
         return
         
-    if text.lower().startswith("-donate "):
+    if text.lower().startswith(f"{self.prefix}donate "):
         await self.donate_points(message)
         return
         
-    if text.lower() == "-kill" and message.author.id == 709796562733105154:
+    if text.lower() == f"{self.prefix}kill" and message.author.id == 709796562733105154:
         await self.logout(message)
         return
         
-    if text.lower().startswith("-balance"):
+    if text.lower().startswith(f"{self.prefix}balance"):
         await self.balance(message)
+        return
+        
+    if text.lower().startswith(f"{self.prefix}help"):
+        await self.send_help_text(message)
         return
     
     await self.clean_leaderboard(message)

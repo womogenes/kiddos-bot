@@ -25,6 +25,7 @@ class Client(discord.Client):
     from ._points import give_points, donate_points, balance
     from ._inherited import fetch_user
     from ._profanity import shit
+    from ._help import send_help_text
     
     def initialize(self):
         with open("./data/date-info.json") as fin:
@@ -59,6 +60,8 @@ class Client(discord.Client):
                 json.dump({ "last-sent-quote": str(self.lastSent) }, fout, indent=2)
                 fout.close()
         
+        
+        self.prefix = "\\"
         
         self.questionCache = []
         
