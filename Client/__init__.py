@@ -73,3 +73,5 @@ class Client(discord.Client):
         self.quoteChannel = self.get_channel(761340228450910250)
         self.leaderboardChannel = self.get_channel(763825477533302856)
         self.userCache = {}
+        
+        self.lbMessages = [767193706590765096, 767193709476446209, 767193712387293245]

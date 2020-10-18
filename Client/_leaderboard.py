@@ -6,7 +6,7 @@ signify = lambda x: "+" + str(x) if x > 0 else x
 
 async def clear_leaderboard(self):
     async for m in self.leaderboardChannel.history():
-        if m.id != 763825813182611477:
+        if m.id not in self.lbMessages:
             await m.delete()
     
     
@@ -14,16 +14,14 @@ async def clean_leaderboard(self, message):
     if message.channel.id != 763825477533302856:
         return
         
-    if message.id != 763825813182611477:
+    if message.id not in self.lbMessages:
         await message.delete()
-            
+        
 
 async def update_leaderboard(self):
     if time.time() - self.lastUpdatedLeaderboard < 60:
         return
     self.lastUpdatedLeaderboard = time.time()
-
-    message = await self.leaderboardChannel.fetch_message(763825813182611477)
     
     # By lifetime points.
     table1 = [["Rank", "Name", "Points"]]
@@ -61,14 +59,18 @@ async def update_leaderboard(self):
     
     text3 = tabulate(table3, headers="firstrow", tablefmt="github", numalign="left")
     
-    text = ""
-    text += f"**Sorted by accuracy:**\n```{text3}```\n"
-    text += f"**Sorted by lifetime points:**\n```{text1}```\n"
-    text += f"**Sorted by this week's points:**\n```{text2}```\n"
+    text1 = f"**Sorted by lifetime points:**\n```{text1}```"
+    text2 = f"**Sorted by this week's points:**\n```{text2}```"
+    text3 = f"**Sorted by accuracy:**\n```{text3}```"
     
-    text = text[:-1]
+    message1 = await self.leaderboardChannel.fetch_message(self.lbMessages[0])
+    await message1.edit(content=text1)
     
-    await message.edit(content=text)
+    message2 = await self.leaderboardChannel.fetch_message(self.lbMessages[1])
+    await message2.edit(content=text2)
+    
+    message3 = await self.leaderboardChannel.fetch_message(self.lbMessages[2])
+    await message3.edit(content=text3)
     
     self.lastUpdatedLeaderboard = time.time()
     print("UPDATED LEADERBOARDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDD")
