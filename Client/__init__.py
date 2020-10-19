@@ -24,7 +24,7 @@ class Client(discord.Client):
     from ._other import teehee, ping, gpt2_chat, logout
     from ._points import give_points, donate_points, balance
     from ._inherited import fetch_user
-    from ._profanity import shit
+    from ._profanity import shit, fuck
     from ._help import send_help_text
     
     def initialize(self):
