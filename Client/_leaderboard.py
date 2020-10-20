@@ -64,13 +64,13 @@ async def update_leaderboard(self):
     text3 = f"**Sorted by accuracy:**\n```{text3}```"
     
     message1 = await self.leaderboardChannel.fetch_message(self.lbMessages[0])
-    await message1.edit(content=text1)
+    await message1.edit(content=text3)
     
     message2 = await self.leaderboardChannel.fetch_message(self.lbMessages[1])
-    await message2.edit(content=text2)
+    await message2.edit(content=text1)
     
     message3 = await self.leaderboardChannel.fetch_message(self.lbMessages[2])
-    await message3.edit(content=text3)
+    await message3.edit(content=text2)
     
     self.lastUpdatedLeaderboard = time.time()
     print("UPDATED LEADERBOARDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDD")
