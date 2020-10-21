@@ -37,7 +37,7 @@ async def on_message(self, message):
         return
         
     if message.author.id == 709796562733105154 and text.lower().startswith(f"{self.prefix}commit "):
-        await self.commit(message, message.content.split(" ", 1)[1])
+        await self.commit(message, message.content.split(" ", 1)[1], verbose=True)
         return
         
     if message.author.id == 709796562733105154 and text.lower().startswith(f"{self.prefix}reward "):
