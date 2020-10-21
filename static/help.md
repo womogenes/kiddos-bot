@@ -22,5 +22,8 @@ Donate `<amount>` points to `<person>`.
 `\kill`
 Only <@!709796562733105154> can do this.
 
+`\commit <message>`
+Only <@!709796562733105154> can do this.
+
 `\reward <person> <amount>`
 Only <@!709796562733105154> can do this.

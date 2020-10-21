@@ -7,7 +7,7 @@ async def logout(self, message):
     
 
 async def commit(self, message, description, verbose=False):
-    messages = ["Tracking files...", "Committing", "Pushing to origin...", "Done!"]
+    messages = ["Tracking files...", "Committing...", "Pushing to origin...", "Done!"]
     async def send(i):
         if verbose: await message.channel.send(messages[i])
     await send(0)
