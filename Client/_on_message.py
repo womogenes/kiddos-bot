@@ -19,12 +19,8 @@ async def on_message(self, message):
         await self.answer_trivia(message)
         return
         
-    if text.lower().startswith(f"{self.prefix}donate "):
+    if channel.id == 762173542233407528 and text.lower().startswith(f"{self.prefix}donate "):
         await self.donate_points(message)
-        return
-        
-    if text.lower() == f"{self.prefix}kill" and message.author.id == 709796562733105154:
-        await self.logout(message)
         return
         
     if text.lower().startswith(f"{self.prefix}balance"):
@@ -33,6 +29,15 @@ async def on_message(self, message):
         
     if text.lower().startswith(f"{self.prefix}help"):
         await self.send_help_text(message)
+        return
+        
+    # Me-specific commands!
+    if message.author.id == 709796562733105154 and text.lower() == f"{self.prefix}kill":
+        await self.logout(message)
+        return
+        
+    if message.author.id == 709796562733105154 and text.lower().startswith(f"{self.prefix}reward "):
+        await self.reward(message)
         return
     
     await self.clean_leaderboard(message)

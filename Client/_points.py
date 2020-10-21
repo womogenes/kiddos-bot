@@ -19,6 +19,30 @@ async def balance(self, message):
     await message.channel.send(f"**{message.author.display_name}** has **{self.points['lifetime'][message.author.id]}** points.")
     
     
+async def reward(self, message):
+    text = message.content.split(" ")
+    if len(text) != 3:
+        return
+    if len(text[1]) < 5:
+        return
+    idx = text[1][3:-1]
+    if not idx.isnumeric():
+        return
+    amount = text[2]
+    if not amount.isnumeric():
+        return
+    amount = int(amount)
+    
+    idx = int(idx)
+    try:
+        user = await self.fetch_user(idx)
+    except:
+        return
+    
+    self.give_points(idx, amount)
+    await message.channel.send(f"**{user.display_name}**, you have been rewarded **{amount}** points! You now have **{self.points['lifetime'][idx]}** points.")
+    
+    
 async def donate_points(self, message):
     text = message.content.split(" ")
     if len(text) != 3:

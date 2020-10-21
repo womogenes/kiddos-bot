@@ -1,3 +1,5 @@
+import discord
+
 async def on_ready(self):
     """
     This function is called when the client is ready.
@@ -9,3 +11,6 @@ async def on_ready(self):
     await self.replenish_cache()
     print("Question cache ready!")
     await self.clear_leaderboard()
+    
+    # Set status!
+    await self.change_presence(activity=discord.Activity(type=discord.ActivityType.listening, name=f"{self.prefix}help"))
