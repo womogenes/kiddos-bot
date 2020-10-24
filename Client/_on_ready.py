@@ -4,6 +4,7 @@ async def on_ready(self):
     """
     This function is called when the client is ready.
     """
+    
     print("Logged on as " + str(self.user) + "!")
     self.initialize()
     await self.send_quote()
@@ -14,3 +15,5 @@ async def on_ready(self):
     
     # Set status!
     await self.change_presence(activity=discord.Activity(type=discord.ActivityType.listening, name=f"{self.prefix}help"))
+    
+    
