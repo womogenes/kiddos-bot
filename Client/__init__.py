@@ -29,6 +29,7 @@ class Client(discord.Client):
     from ._profanity import shit, fuck
     from ._help import send_help_text
     from ._meta import logout, commit
+    from ._databasing import get_attrib
     
     def initialize(self):
         with open("./static/mongo-info.json") as fin:
@@ -36,13 +37,13 @@ class Client(discord.Client):
             url = f"mongodb+srv://womogenes:{mongoInfo['password']}@cluster0.w4adg.mongodb.net/{mongoInfo['dbname']}?retryWrites=true&w=majority"
             self.db = MongoClient(url).main
             print("Established MongoDB connection!")
-            
+        
         self.lastSent = dt.strptime(next(self.db.dateInfo.find({}))["last-sent-quote"], "%Y-%m-%d %H:%M:%S.%f")
         
         # Reset weekly points on a ?day.
-        if dt.now().weekday() == 6 and dt.strptime(next(self.db.dateInfo.find({}))["last-reset-weekly-points"], "%Y-%m-%d %H:%M:%S.%f").date() != dt.now().date():
-            self.db.users.update({}, {"$set": {"weekly": 0}})
-            self.db.dateInfo.update_one({"_id": oid("5f95f45f652561f2efd7b93c")}, {"$set": {"last-reset-weekly-points": str(dt.now())}})
+        if dt.now().weekday() == 0 and dt.strptime(next(self.db.dateInfo.find({}))["last-reset-weekly-points"], "%Y-%m-%d %H:%M:%S.%f").date() != dt.now().date():
+            self.db.users.update_many({}, {"$set": {"weekly": 0}})
+            self.db.dateInfo.update_one({}, {"$set": {"last-reset-weekly-points": str(dt.now())}})
             print("Weekly point reset finished.")
         
         

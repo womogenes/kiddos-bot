@@ -75,22 +75,30 @@ async def answer_trivia(self, message):
         
     self.answered = True
     
-    if message.author.id not in self.points["lifetime"]:
-        self.points["hitrate"][message.author.id] = [0, 0]
-        
-    self.points["hitrate"][message.author.id][1] += 1
-    
     if correct:
         await message.add_reaction("🧠")
         self.give_points(message.author.id, self.questionPoints)
-        self.points["hitrate"][message.author.id][0] += 1
-        await self.botChannel.send(f"""Correct! 😀 {message.author.display_name} now has **{self.points["lifetime"][message.author.id]}** points. (+{self.questionPoints})""")
+        x = self.db.users.find_one({"idx": message.author.id})
+        
+        x["hitrate"][0] += 1
+        x["hitrate"][1] += 1
+        self.db.users.update_one({"idx": message.author.id}, {"$set": x})
+        
+        await self.botChannel.send(f"""Correct! 😀 {message.author.display_name} now has **{self.get_attrib(message.author.id, 'lifetime')}** points. (+{self.questionPoints})""")
         
     else:
         await message.add_reaction("☹️")
         self.lostPoints = -1
         self.give_points(message.author.id, self.lostPoints)
+        
+        x = self.db.users.find_one({"idx": message.author.id})
+        x["hitrate"][1] += 1
+        self.db.users.update_one({"idx": message.author.id}, {"$set": x})
+        
         await self.botChannel.send(f"""Sorry, {message.author.display_name} ️☹️ The right answer was **{self.rightAnswer}**.
-{message.author.display_name} now has **{self.points["lifetime"][message.author.id]}** points. ({self.lostPoints})""")
+{message.author.display_name} now has **{self.get_attrib(message.author.id, 'lifetime')}** points. ({self.lostPoints})""")
+
+    
+
     
     await self.update_leaderboard()

@@ -19,42 +19,43 @@ async def clean_leaderboard(self, message):
         
 
 async def update_leaderboard(self):
-    if time.time() - self.lastUpdatedLeaderboard < 60:
+    if time.time() - self.lastUpdatedLeaderboard < 120:
         return
     self.lastUpdatedLeaderboard = time.time()
     
+    points = list(self.db.users.find({}))
+    
     # By lifetime points.
     table1 = [["Rank", "Name", "Points"]]
-    tp = sorted(self.points["lifetime"], key=lambda x: self.points["lifetime"][x], reverse=True)
+    tp = sorted(points, key=lambda x: x["lifetime"], reverse=True)
     for i in range(len(tp)):
-        user = await self.fetch_user(tp[i])
-        table1.append([ordinal(i + 1), user.display_name, self.points["lifetime"][tp[i]]])
+        user = await self.fetch_user(tp[i]["idx"])
+        table1.append([ordinal(i + 1), user.display_name, tp[i]["lifetime"]])
     
     text1 = tabulate(table1, headers="firstrow", tablefmt="github", numalign="left")
     
     # By weekly points.
     table2 = [["Rank", "Name", "Points"]]
-    tw = sorted(self.points["weekly"], key=lambda x: self.points["weekly"][x], reverse=True)
+    tw = sorted(points, key=lambda x: x["weekly"], reverse=True)
     for i in range(len(tw)):
-        user = await self.fetch_user(tw[i])
-        x = self.points["weekly"][tw[i]]
-        table2.append([ordinal(i + 1), user.display_name, signify(self.points["weekly"][tw[i]])])
+        user = await self.fetch_user(tw[i]["idx"])
+        table2.append([ordinal(i + 1), user.display_name, signify(tw[i]["weekly"])])
     
     text2 = tabulate(table2, headers="firstrow", tablefmt="github", numalign="left")
     
     # By hitrate.
     table3 = [["Rank", "Name", "Correct/Total", "Accuracy"]]
     def hitrate(x):
-        if self.points["hitrate"][x][1] < 10:
+        if x["hitrate"][1] < 10:
             return 0
-        return self.points["hitrate"][x][0] / self.points["hitrate"][x][1]
+        return x["hitrate"][0] / x["hitrate"][1]
         
-    ac = sorted(self.points["weekly"], key=hitrate, reverse=True)
+    ac = sorted(points, key=hitrate, reverse=True)
     for i in range(len(ac)):
-        user = await self.fetch_user(ac[i])
-        percent = 0 if self.points["hitrate"][user.id][1] == 0 else self.points["hitrate"][user.id][0] / self.points["hitrate"][user.id][1]
+        user = await self.fetch_user(ac[i]["idx"])
+        percent = 0 if ac[i]["hitrate"][1] == 0 else ac[i]["hitrate"][0] / ac[i]["hitrate"][1]
         percentage = str(round(percent * 100, 1)) + "%"
-        outof = f"{self.points['hitrate'][user.id][0]}/{self.points['hitrate'][user.id][1]}"
+        outof = f"{ac[i]['hitrate'][0]}/{ac[i]['hitrate'][1]}"
         table3.append([ordinal(i + 1), user.display_name, outof, percentage])
     
     text3 = tabulate(table3, headers="firstrow", tablefmt="github", numalign="left")
