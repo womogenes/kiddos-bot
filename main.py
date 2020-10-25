@@ -2,5 +2,8 @@
 
 import Client
 
+with open("./static/token.txt") as fin:
+    token = fin.read()
+
 client = Client.Client()
-client.run('NzYyMTY0MTkxNDEwNTIwMDk0.X3lKtw.rFAjDvgtGDKi5DvnSYl0HiTu96U')
+client.run(token)
