@@ -14,7 +14,7 @@ async def commit(self, message, description, verbose=False):
     await send(0)
     os.system("git add .")
     await send(1)
-    os.system('git commit -m "{description}"')
+    os.system(f'git commit -m "{description}"')
     await send(2)
     os.system("git push")
     await send(3)
