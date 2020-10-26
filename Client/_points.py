@@ -4,6 +4,7 @@ def give_points(self, userID, points):
     info = self.db.users.find_one({"idx": userID})
     if not info:
         info = {
+            "idx": userID,
             "lifetime": 0,
             "weekly": 0,
             "hitrate": [0, 0]
