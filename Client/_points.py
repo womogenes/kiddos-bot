@@ -1,22 +1,24 @@
 import json
 
 def give_points(self, userID, points):
-    if userID not in self.points["lifetime"]:
-        self.points["lifetime"][userID] = 0
-        self.points["weekly"][userID] = 0
-        self.points["hitrate"][userID] = [0, 0]
-    self.points["lifetime"][userID] += points
-    self.points["weekly"][userID] += points
+    info = self.db.users.find_one({"idx": userID})
+    if not info:
+        info = {
+            "lifetime": 0,
+            "weekly": 0,
+            "hitrate": [0, 0]
+        }
+        self.db.users.insert_one(info)
+    info["lifetime"] += points
+    info["weekly"] += points
+    self.db.users.update_one({"idx": userID}, {"$set": info})
     
-    with open("./data/point-info.json", "w") as fout:
-        json.dump(self.points, fout, indent=2)
-        
 
 async def balance(self, message):
-    if message.author.id not in self.points["lifetime"]:
-        await message.channel.send(f"**{message.author.display_name}** does not have any points.")
+    if not self.db.users.find_one({"idx": message.author.id}):
+        await message.channel.send(f"**{message.author.display_name}**, yo do not have any points.")
         
-    await message.channel.send(f"**{message.author.display_name}** has **{self.points['lifetime'][message.author.id]}** points.")
+    await message.channel.send(f"**{message.author.display_name}** has **{self.get_attrib(message.author.id, 'lifetime')}** points.")
     
     
 async def reward(self, message):
@@ -40,7 +42,7 @@ async def reward(self, message):
         return
     
     self.give_points(idx, amount)
-    await message.channel.send(f"**{user.display_name}**, you have been rewarded **{amount}** points! You now have **{self.points['lifetime'][idx]}** points.")
+    await message.channel.send(f"**{user.display_name}**, you have been rewarded **{amount}** points! You now have **{self.get_attrib(idx, 'lifetime')}** points.")
     
     
 async def donate_points(self, message):
@@ -57,20 +59,20 @@ async def donate_points(self, message):
         return
     amount = int(amount)
     
-    if message.author.id not in self.points["lifetime"]:
+    if not self.get_attrib(message.author.id):
         await message.channel.send(f"**{message.author.display_name}**, you do not have any points!")
         return
         
-    if self.points["lifetime"][message.author.id] < 0:
-        await message.channel.send(f"**{message.author.display_name}**, you are in debt with {self.points['lifetime'][message.author.id]} points. :frowning2:")
+    if self.get_attrib(message.author.id, 'lifetime') < 0:
+        await message.channel.send(f"**{message.author.display_name}**, you are in debt with {self.get_attrib(message.author.id, 'lifetime')} points. :frowning2:")
         return
         
     if amount < 0:
         await message.channel.send(f"**Nice try, {message.author.display_name}** 😉")
     
-    if amount > self.points["lifetime"][message.author.id]:
-        short = amount - self.points["lifetime"][message.author.id]
-        await message.channel.send(f"**{message.author.display_name}**, you have **{self.points['lifetime'][message.author.id]}** points, which is **{amount - self.points['lifetime'][message.author.id]}** points short of **{amount}**. :frowning2:")
+    if amount > self.get_attrib(message.author.id, 'lifetime'):
+        short = amount - self.get_attrib(message.author.id, 'lifetime')
+        await message.channel.send(f"**{message.author.display_name}**, you have **{self.get_attrib(message.author.id, 'lifetime')}** points, which is **{amount - self.get_attrib(message.author.id, 'lifetime')}** points short of **{amount}**. :frowning2:")
         return
     
     idx = int(idx)
@@ -82,6 +84,6 @@ async def donate_points(self, message):
     self.give_points(idx, amount)
     self.give_points(message.author.id, -amount)
     
-    await message.channel.send(f"**{message.author.display_name}** now has **{self.points['lifetime'][message.author.id]}** points and **{user.display_name}** now has **{self.points['lifetime'][idx]}** points.")
+    await message.channel.send(f"**{message.author.display_name}** now has **{self.get_attrib(message.author.id, 'lifetime')}** points and **{user.display_name}** now has **{self.get_attrib(idx, 'lifetime')}** points.")
     await self.update_leaderboard()
     return

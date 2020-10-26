@@ -2,3 +2,4 @@ gpt2-chatbot/
 dataset_cache_OpenAIGPTTokenizer
 Client/__pycache__
 static/token.txt
+static/mongo-info.json

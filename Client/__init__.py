@@ -7,8 +7,10 @@ import sys
 import os
 import time
 import json
+from bson.objectid import ObjectId as oid
 from datetime import datetime as dt
 import requests
+from pymongo import MongoClient
 from pprint import pprint
 
 from html import unescape
@@ -27,39 +29,22 @@ class Client(discord.Client):
     from ._profanity import shit, fuck
     from ._help import send_help_text
     from ._meta import logout, commit
+    from ._databasing import get_attrib
     
     def initialize(self):
-        with open("./data/date-info.json") as fin:
-            self.dateInfo = json.load(fin)
-            self.lastSent = dt.strptime(self.dateInfo["last-sent-quote"], "%Y-%m-%d %H:%M:%S.%f")
-            fin.close()
-            
-        with open("./data/trivia-info.json") as fin:
-            self.triviaInfo = json.load(fin)
-            fin.close()
+        with open("./static/mongo-info.json") as fin:
+            mongoInfo = json.load(fin)
+            url = f"mongodb+srv://womogenes:{mongoInfo['password']}@cluster0.w4adg.mongodb.net/{mongoInfo['dbname']}?retryWrites=true&w=majority"
+            self.db = MongoClient(url).main
+            print("Established MongoDB connection!")
         
-        with open("./data/point-info.json") as fin:
-            x = json.load(fin)
-            self.points = {"lifetime": {}, "weekly": {}, "hitrate": {}}
-            for i in x["lifetime"]:
-                self.points["lifetime"][int(i)] = x["lifetime"][i]
-            for i in x["weekly"]:
-                self.points["weekly"][int(i)] = x["weekly"][i]
-            for i in x["hitrate"]:
-                self.points["hitrate"][int(i)] = x["hitrate"][i]
-            fin.close()
+        self.lastSent = dt.strptime(next(self.db.dateInfo.find({}))["last-sent-quote"], "%Y-%m-%d %H:%M:%S.%f")
         
         # Reset weekly points on a ?day.
-        if dt.now().weekday() == 0 and dt.strptime(self.dateInfo["last-reset-weekly-points"], "%Y-%m-%d %H:%M:%S.%f").date() != dt.now().date():
-            for i in self.points["weekly"]:
-                self.points["weekly"][i] = 0
-            with open("./data/point-info.json", "w") as fout:
-                json.dump(self.points, fout, indent=2)
-                fout.close()
-            self.dateInfo["last-reset-weekly-points"] = str(dt.now())
-            with open("./data/date-info.json", "w") as fout:
-                json.dump({ "last-sent-quote": str(self.lastSent) }, fout, indent=2)
-                fout.close()
+        if dt.now().weekday() == 0 and dt.strptime(next(self.db.dateInfo.find({}))["last-reset-weekly-points"], "%Y-%m-%d %H:%M:%S.%f").date() != dt.now().date():
+            self.db.users.update_many({}, {"$set": {"weekly": 0}})
+            self.db.dateInfo.update_one({}, {"$set": {"last-reset-weekly-points": str(dt.now())}})
+            print("Weekly point reset finished.")
         
         
         self.prefix = "\\"
