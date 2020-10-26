@@ -8,13 +8,13 @@ async def logout(self, message):
     
 
 async def commit(self, message, description, verbose=False):
-    messages = ["Tracking files...", "Committing...", "Pushing to origin...", "Done!"]
-    async def send(i):
-        if verbose: await message.channel.send(messages[i])
-    await send(0)
-    os.system("git add .")
-    await send(1)
-    os.system(f'git commit -m "{description}"')
-    await send(2)
-    os.system("git push")
-    await send(3)
+    steps = [
+        ["git add .", "Tracking files..."],
+        [f"git commit -m {description}", "Committing..."],
+        ["git push", "Pushing to origin..."],
+        ["", "Done"]
+    ]
+    for command, message in steps:
+        if verbose:
+            await message.channel.send(message)
+        os.system(command)
