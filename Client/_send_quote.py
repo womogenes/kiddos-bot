@@ -4,7 +4,7 @@ from datetime import datetime as dt
 import requests
 
 async def send_quote(self):
-    if self.lastSent.date() != dt.now().date():
+    if dt.strptime(next(self.db.dateInfo.find({}))["last-sent-quote"], "%Y-%m-%d %H:%M:%S.%f").date() != dt.now().date() != dt.now().date():
         url = 'https://quotes.rest/qod?category=inspire'
         api_token = "X-TheySaidSo-Api-Secret"
         headers = {
@@ -16,9 +16,6 @@ async def send_quote(self):
         quotes = response.json()["contents"]["quotes"][0]
         
         # Spammy quotes!
-        msgId = await self.quoteChannel.send(f"""**Quote of the day:**\n\n> {quotes["quote"]}\n\n~ *{quotes["author"]}*""")
-
-        self.dateInfo["last-sent-quote"] = str(dt.now())
-        with open("./data/date-info.json", "w") as fout:
-            json.dump(self.dateInfo, fout, indent=2)
-            fout.close()
+        await self.quoteChannel.send(f"""**Quote of the day:**\n\n> {quotes["quote"]}\n\n~ *{quotes["author"]}*""")
+        
+        self.db.dateInfo.update_one({}, {"$set": {"last-sent-quote": str(dt.now())}})

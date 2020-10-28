@@ -15,5 +15,3 @@ async def on_ready(self):
     
     # Set status!
     await self.change_presence(activity=discord.Activity(type=discord.ActivityType.listening, name=f"{self.prefix}help"))
-    
-    

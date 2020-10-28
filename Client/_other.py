@@ -1,6 +1,7 @@
 import random
 import discord
-import os    
+import os
+import re
 
 async def teehee(self, message):
     if message.channel.id == 763825477533302856:
@@ -11,6 +12,13 @@ async def teehee(self, message):
         if random.randrange(5) < 1:
             await message.channel.send("teehee :P")
             return
+            
+            
+async def apcs(self, message):
+    if re.match("ap.?cs", message.content.lower()):
+        reactions = ["💻", "🤪"]
+        for r in reactions:
+            await message.add_reaction(r)
 
 
 async def ping(self, message):
