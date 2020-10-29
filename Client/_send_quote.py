@@ -4,7 +4,7 @@ from datetime import datetime as dt
 import requests
 
 async def send_quote(self):
-    if dt.strptime(next(self.db.dateInfo.find({}))["last-sent-quote"], "%Y-%m-%d %H:%M:%S.%f").date() != dt.now().date() != dt.now().date():
+    if dt.strptime(next(self.db.dateInfo.find({}))["last-sent-quote"], "%Y-%m-%d %H:%M:%S.%f").date() != dt.now().date():
         url = 'https://quotes.rest/qod?category=inspire'
         api_token = "X-TheySaidSo-Api-Secret"
         headers = {
