@@ -23,10 +23,10 @@ class Client(discord.Client):
     from ._send_quote import send_quote
     from ._trivia import replenish_cache, send_trivia, answer_trivia
     from ._leaderboard import clear_leaderboard, clean_leaderboard, update_leaderboard
-    from ._other import teehee, ping, gpt2_chat, apcs
+    from ._other import teehee, ping, gpt2_chat
     from ._points import give_points, donate_points, balance, reward
     from ._inherited import fetch_user
-    from ._profanity import shit, fuck
+    from ._reactions import react
     from ._help import send_help_text
     from ._meta import logout, commit
     from ._databasing import get_attrib

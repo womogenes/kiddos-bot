@@ -12,11 +12,13 @@ async def clear_leaderboard(self):
     
 async def clean_leaderboard(self, message):
     if message.channel.id != 763825477533302856:
-        return
+        return False
         
     if message.id not in self.lbMessages:
         await message.delete()
-        
+        return True
+
+    return False
 
 async def update_leaderboard(self):
     if time.time() - self.lastUpdatedLeaderboard < 120:

@@ -12,14 +12,6 @@ async def teehee(self, message):
         if random.randrange(5) < 1:
             await message.channel.send("teehee :P")
             return
-            
-            
-async def apcs(self, message):
-    if re.match("ap.?cs", message.content.lower()):
-        reactions = ["💻", "🤪"]
-        for r in reactions:
-            await message.add_reaction(r)
-
 
 async def ping(self, message):
     if "<@!762164191410520094>" in message.content and message.channel != self.leaderboardChannel:

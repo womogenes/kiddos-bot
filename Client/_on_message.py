@@ -32,21 +32,20 @@ async def on_message(self, message):
         return
         
     # Me-specific commands!
-    if message.author.id == 709796562733105154 and text.lower() == f"{self.prefix}kill":
-        await self.logout(message)
-        return
+    if message.author.id == 709796562733105154:
+        if text.lower() == f"{self.prefix}kill":
+            await self.logout(message)
+            return
         
-    if message.author.id == 709796562733105154 and text.lower().startswith(f"{self.prefix}commit "):
-        await self.commit(message, message.content.split(" ", 1)[1], verbose=True)
-        return
-        
-    if message.author.id == 709796562733105154 and text.lower().startswith(f"{self.prefix}reward "):
-        await self.reward(message)
-        return
+        if text.lower().startswith(f"{self.prefix}commit "):
+            await self.commit(message, message.content.split(" ", 1)[1], verbose=True)
+            return
+            
+        if text.lower().startswith(f"{self.prefix}reward "):
+            await self.reward(message)
+            return
     
-    await self.clean_leaderboard(message)
-    await self.shit(message)
-    await self.fuck(message)
-    await self.apcs(message)
+    if await self.clean_leaderboard(message): return
+    await self.react(message)
     if await self.teehee(message): return
     if await self.ping(message): return

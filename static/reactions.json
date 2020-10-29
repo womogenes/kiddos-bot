@@ -1,0 +1,18 @@
+[
+  {
+    "regex": "sh(i|\\*|!|l|1|¡)t",
+    "reactions": ["💩"]
+  },
+  {
+    "regex": "f(u|\\*|/|)ck",
+    "reactions": ["🖕"]
+  },
+  {
+    "regex": "ap.?cs",
+    "reactions": ["💻", "🤪"]
+  },
+  {
+    "regex": ":noe:",
+    "reactions": [":noe:"]
+  }
+]
