@@ -1,18 +1,42 @@
 [
   {
-    "regex": "sh(i|\\*|!|l|1|¡)t",
+    "regex": "sh(i|\\*|!|l|1|¡)?t",
     "reactions": ["💩"]
   },
   {
-    "regex": "f(u|\\*|/|)ck",
+    "regex": "f(u|\\*|\\/|)?ck",
     "reactions": ["🖕"]
   },
   {
-    "regex": "ap.?cs",
+    "regex": "ap ?cs",
     "reactions": ["💻", "🤪"]
   },
   {
-    "regex": ":noe:",
+    "regex": "noe",
     "reactions": [":noe:"]
+  },
+  {
+    "regex": "trump",
+    "reactions": ["🍊", ":orangeman:"]
+  },
+  {
+    "regex": "\\b(god|lord)\\b",
+    "reactions": ["😇"]
+  },
+  {
+    "regex": "(william)|(\\bbill\\b)",
+    "reactions": [":william:"]
+  },
+  {
+    "regex": "billie",
+    "reactions": [":billie:"]
+  },
+  {
+    "regex": "frogs?",
+    "reactions": [":froggie:"]
+  },
+  {
+    "regex": "(halloween)|(pumpkins)",
+    "reactions": ["🎃"]
   }
 ]
