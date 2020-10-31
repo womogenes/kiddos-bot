@@ -38,5 +38,9 @@
   {
     "regex": "(halloween)|(pumpkins)",
     "reactions": ["🎃"]
+  },
+  {
+    "regex": "usaco",
+    "reactions": ["🙏", "🐮"]
   }
 ]
