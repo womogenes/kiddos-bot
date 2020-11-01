@@ -32,7 +32,7 @@ async def on_message(self, message):
         return
         
     # Me-specific commands!
-    if message.author.id == 709796562733105154:
+    if 763544205774815273 in [i.id for i in message.author.roles]:
         if text.lower() == f"{self.prefix}kill":
             await self.logout(message)
             return

@@ -20,10 +20,10 @@ Donate `<amount>` points to `<person>`.
  `<amount>` cannot exceed your total number of points and it must be a nonnegative integer. This command only works in <#762173542233407528>.
 
 `\kill`
-Only <@!709796562733105154> can do this.
+Only <@&763544205774815273> can do this.
 
 `\commit <message>`
-Only <@!709796562733105154> can do this.
+Only <@&763544205774815273> can do this.
 
 `\reward <person> <amount>`
-Only <@!709796562733105154> can do this.
+Only <@&763544205774815273> can do this.
