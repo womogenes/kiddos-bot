@@ -7,7 +7,8 @@ def give_points(self, userID, points):
             "idx": userID,
             "lifetime": 0,
             "weekly": 0,
-            "hitrate": [0, 0]
+            "hitrate": [0, 0],
+            "streak": 0
         }
         self.db.users.insert_one(info)
     info["lifetime"] += points

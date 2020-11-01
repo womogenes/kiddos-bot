@@ -34,6 +34,7 @@ async def send_trivia(self):
         self.question += f"\n{unescape(q['question'])}"
         
         self.rightAnswer = unescape(q["correct_answer"]).strip()
+        print(f"RIGHT ANSWER: {self.rightAnswer}")
         self.answers = [unescape(i).strip() for i in q["incorrect_answers"] + [self.rightAnswer]]
         allNumeric = True
         for i in self.answers:
@@ -82,9 +83,13 @@ async def answer_trivia(self, message):
         
         x["hitrate"][0] += 1
         x["hitrate"][1] += 1
+        x["streak"] += 1
         self.db.users.update_one({"idx": message.author.id}, {"$set": x})
         
-        await self.botChannel.send(f"""Correct! 😀 {message.author.display_name} now has **{self.get_attrib(message.author.id, 'lifetime')}** points. (+{self.questionPoints})""")
+        await message.channel.send(f"""Correct! 😀 {message.author.display_name} now has **{self.get_attrib(message.author.id, 'lifetime')}** points. (+{self.questionPoints})""")
+        if x["streak"] % 5 == 0:
+            await message.channel.send(f"""You are on a streak of **{x["streak"]}** questions! +{x["streak"]} points!""")
+            self.give_points(message.author.id, x["streak"])
         
     else:
         await message.add_reaction("☹️")
@@ -93,12 +98,11 @@ async def answer_trivia(self, message):
         
         x = self.db.users.find_one({"idx": message.author.id})
         x["hitrate"][1] += 1
+        x["streak"] = 0
         self.db.users.update_one({"idx": message.author.id}, {"$set": x})
         
-        await self.botChannel.send(f"""Sorry, {message.author.display_name} ️☹️ The right answer was **{self.rightAnswer}**.
+        await message.channel.send(f"""Sorry, {message.author.display_name} ️☹️ The right answer was **{self.rightAnswer}**.
 {message.author.display_name} now has **{self.get_attrib(message.author.id, 'lifetime')}** points. ({self.lostPoints})""")
-
-    
 
     
     await self.update_leaderboard()
