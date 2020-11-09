@@ -30,6 +30,7 @@ class Client(discord.Client):
     from ._help import send_help_text
     from ._meta import logout, commit
     from ._databasing import get_attrib
+    from ._announcements import clean_announcements, clear_announcements
     
     def initialize(self):
         with open("./static/mongo-info.json") as fin:
@@ -62,6 +63,7 @@ class Client(discord.Client):
         self.botChannel = self.get_channel(762173542233407528)
         self.quoteChannel = self.get_channel(761340228450910250)
         self.leaderboardChannel = self.get_channel(763825477533302856)
+        self.announcementsChannel = self.get_channel(774135689163440188)
         self.userCache = {}
         
         self.lbMessages = [767193706590765096, 767193709476446209, 767193712387293245]

@@ -12,6 +12,7 @@ async def on_ready(self):
     await self.replenish_cache()
     print("Question cache ready!")
     await self.clear_leaderboard()
+    await self.clear_announcements()
     
     # Set status!
     await self.change_presence(activity=discord.Activity(type=discord.ActivityType.listening, name=f"{self.prefix}help"))

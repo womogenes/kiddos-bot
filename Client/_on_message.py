@@ -46,6 +46,7 @@ async def on_message(self, message):
             return
     
     if await self.clean_leaderboard(message): return
+    if await self.clean_announcements(message): return
     await self.react(message)
     if await self.teehee(message): return
     if await self.ping(message): return
