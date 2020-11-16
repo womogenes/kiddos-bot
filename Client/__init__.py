@@ -19,7 +19,7 @@ from tabulate import tabulate
 class Client(discord.Client):
     
     from ._on_ready import on_ready
-    from ._on_message import on_message
+    from ._on_message import _on_message
     from ._send_quote import send_quote
     from ._trivia import replenish_cache, send_trivia, answer_trivia
     from ._leaderboard import clear_leaderboard, clean_leaderboard, update_leaderboard

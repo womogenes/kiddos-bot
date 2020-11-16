@@ -1,10 +1,10 @@
 [
   {
-    "regex": "sh(i|\\*|!|l|1|¡)?t",
+    "regex": "sh(i|\\*|!|l|1|¡)?t+",
     "reactions": ["💩"]
   },
   {
-    "regex": "f(u|\\*|\\/|)?ck",
+    "regex": "f(u|\\*|\\/|)?ck+",
     "reactions": ["🖕"]
   },
   {
@@ -42,5 +42,9 @@
   {
     "regex": "usaco",
     "reactions": ["🙏", "🐮"]
+  },
+  {
+    "regex": "\\.com",
+    "reactions": ["😠"]
   }
 ]

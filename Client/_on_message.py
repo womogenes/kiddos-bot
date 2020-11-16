@@ -1,6 +1,6 @@
 from datetime import datetime as dt
 
-async def on_message(self, message):
+async def _on_message(self, message):
     clippedMessage = message.content if len(message.content) < 32 else message.content[:32]
     print(str(message.author).ljust(32) + "> " + clippedMessage.ljust(40) + " " + str(dt.now()))
     
