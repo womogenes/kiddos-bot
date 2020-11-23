@@ -8,6 +8,10 @@
     "reactions": ["🖕"]
   },
   {
+    "regex": "f(u|\\*|\\/|)?ck (you|me|him|her|them|it)",
+    "reactions": "😏"
+  },
+  {
     "regex": "ap ?cs",
     "reactions": ["💻", "🤪"]
   },
@@ -46,5 +50,13 @@
   {
     "regex": "\\.com",
     "reactions": ["😠"]
+  },
+  {
+    "regex": "(\\bls\\b|lakeside)",
+    "reactions": [":noe:", ":lakeside:"]
+  },
+  {
+    "regex": "^indeed$",
+    "reactions": ["⏺", "🇨", "🇴", "🇲"]
   }
 ]
