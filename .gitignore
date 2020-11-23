@@ -4,3 +4,4 @@ Client/__pycache__
 static/token.txt
 static/mongo-info.json
 .vscode/
+**.webm

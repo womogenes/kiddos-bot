@@ -66,6 +66,6 @@ async def play_music(self):
     while True:
         if not self.voice.is_playing():
             url = random.choice(self.playlist)
-            source = await YTDLSource.from_url(url, loop=False)
+            source = await YTDLSource.from_url(url, loop=False, stream=True)
             self.voice.play(source)
         await asyncio.sleep(5)
