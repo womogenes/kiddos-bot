@@ -31,6 +31,7 @@ class Client(discord.Client):
     from ._meta import logout, commit
     from ._databasing import get_attrib
     from ._announcements import clean_announcements, clear_announcements
+    from ._music import music, play_music
     
     def initialize(self):
         with open("./static/mongo-info.json") as fin:
