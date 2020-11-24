@@ -2,6 +2,7 @@ import asyncio
 import youtube_dl
 import discord
 import random
+import os
 
 youtube_dl.utils.bug_reports_message = lambda: ""
 
@@ -38,19 +39,25 @@ class YTDLSource(discord.PCMVolumeTransformer):
     async def from_url(cls, url, *, loop=None, stream=False):
         loop = loop or asyncio.get_event_loop()
         data = await loop.run_in_executor(None, lambda: ytdl.extract_info(url, download=not stream))
-
+        
         if "entries" in data:
-            # take first item from a playlist
+            # Take first item from a playlist
             data = data["entries"][0]
 
         filename = data["url"] if stream else ytdl.prepare_filename(data)
         return cls(discord.FFmpegPCMAudio(filename, **ffmpeg_options), data=data)
 
 
-
 async def music(self):
+    self.playlist = []
     with open("./static/playlist.txt") as fin:
-        self.playlist = fin.read().split("\n")
+        fin.readline() # Header
+        x = fin.readline()
+        while x:
+            k = x.split("\t")
+            if len(k[1]) > 0:
+                self.playlist.append(k)
+            x = fin.readline()
 
     self.vc = self.get_channel(764193661461200926)
     self.voice = await self.vc.connect()
@@ -65,7 +72,16 @@ async def music(self):
 async def play_music(self):
     while True:
         if not self.voice.is_playing():
-            url = random.choice(self.playlist)
-            source = await YTDLSource.from_url(url, loop=False, stream=True)
-            self.voice.play(source)
-        await asyncio.sleep(5)
+            while True:
+                try:
+                    url = random.choice(self.playlist)[1]
+                    print(url)
+                    os.chdir("./temp")
+                    source = await YTDLSource.from_url(url, loop=False, stream=False)
+                    os.chdir(os.pardir)
+                    self.voice.play(source)
+                    break
+
+                except:
+                    pass
+        await asyncio.sleep(10)
