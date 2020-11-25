@@ -48,10 +48,6 @@
     "reactions": ["🙏", "🐮"]
   },
   {
-    "regex": "\\.com",
-    "reactions": ["😠"]
-  },
-  {
     "regex": "(\\bls\\b|lakeside)",
     "reactions": [":noe:", ":lakeside:"]
   },

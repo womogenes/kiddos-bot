@@ -66,22 +66,25 @@ async def music(self):
 
     print("Connected to voice channel!")
 
-    await self.play_music()
+    asyncio.ensure_future(self.play_music())
 
 
 async def play_music(self):
     while True:
         if not self.voice.is_playing():
             while True:
+                url = random.choice(self.playlist)[1].strip()
+                if url == "":
+                    continue
+                print(url)
+                print(repr(url))
+                os.chdir("./temp")
                 try:
-                    url = random.choice(self.playlist)[1]
-                    print(url)
-                    os.chdir("./temp")
                     source = await YTDLSource.from_url(url, loop=False, stream=False)
-                    os.chdir(os.pardir)
                     self.voice.play(source)
+                    os.chdir(os.pardir)
                     break
-
                 except:
-                    pass
+                    os.chdir(os.pardir)
+
         await asyncio.sleep(10)

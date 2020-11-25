@@ -17,7 +17,6 @@ async def on_ready(self):
     # Set status!
     await self.change_presence(activity=discord.Activity(type=discord.ActivityType.listening, name=f"{self.prefix}help"))
 
-    # Do the music stuff
     await self.music()
 
     self.on_message = self._on_message
