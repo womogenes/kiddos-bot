@@ -4,6 +4,8 @@ import discord
 import random
 import os
 
+from pprint import pprint
+
 youtube_dl.utils.bug_reports_message = lambda: ""
 
 ytdl_format_options = {
@@ -44,8 +46,10 @@ class YTDLSource(discord.PCMVolumeTransformer):
             # Take first item from a playlist
             data = data["entries"][0]
 
+        #pprint(data)
+
         filename = data["url"] if stream else ytdl.prepare_filename(data)
-        return cls(discord.FFmpegPCMAudio(filename, **ffmpeg_options), data=data)
+        return cls(discord.FFmpegPCMAudio(filename, **ffmpeg_options), data=data), data
 
 
 async def music(self):
@@ -73,17 +77,29 @@ async def play_music(self):
     while True:
         if not self.voice.is_playing():
             while True:
-                url = random.choice(self.playlist)[1].strip()
+                song = random.choice(self.playlist)
+                url = song[1].strip()
                 if url == "":
                     continue
                 print(url)
                 print(repr(url))
                 os.chdir("./temp")
+
                 try:
-                    source = await YTDLSource.from_url(url, loop=False, stream=False)
+                    source, data = await YTDLSource.from_url(url, loop=False, stream=False)
                     self.voice.play(source)
+                    self.songsPlayed += 1
                     os.chdir(os.pardir)
+                    
+                    title = "🎅🎄  Now playing  ☃️🔥"
+                    print(data['title'])
+                    description = f"[{data['title']}]({url})"
+                    color = 0xff0000 if self.songsPlayed % 2 else 0x3f9137
+                    musicEmbed = discord.Embed(title=title, description=description, color=color)
+                    await self.musicChannel.send(embed=musicEmbed)
+
                     break
+
                 except:
                     os.chdir(os.pardir)
 

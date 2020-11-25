@@ -61,11 +61,13 @@ class Client(discord.Client):
         self.answered = True
         self.lastSentQuestion = 0
         self.lastUpdatedLeaderboard = 0
+        self.songsPlayed = 0
         
         self.botChannel = self.get_channel(762173542233407528)
         self.quoteChannel = self.get_channel(761340228450910250)
         self.leaderboardChannel = self.get_channel(763825477533302856)
         self.announcementsChannel = self.get_channel(774135689163440188)
+        self.musicChannel = self.get_channel(761339710022746157)
         self.userCache = {}
         
         self.lbMessages = [767193706590765096, 767193709476446209, 767193712387293245]
