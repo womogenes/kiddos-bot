@@ -32,7 +32,7 @@ class Client(discord.Client):
     from ._meta import logout, commit
     from ._databasing import get_attrib
     from ._announcements import clean_announcements, clear_announcements
-    from ._music import music, play_music
+    from ._music import music, play_music, stop_music, flash_music_embed
     
     def initialize(self):
         with open("./static/mongo-info.json") as fin:
@@ -62,6 +62,7 @@ class Client(discord.Client):
         self.lastSentQuestion = 0
         self.lastUpdatedLeaderboard = 0
         self.songsPlayed = 0
+        self.songEmbedMessage = None
         
         self.botChannel = self.get_channel(762173542233407528)
         self.quoteChannel = self.get_channel(761340228450910250)

@@ -3,6 +3,8 @@ import youtube_dl
 import discord
 import random
 import os
+import datetime as dt
+import time
 
 from pprint import pprint
 
@@ -71,6 +73,28 @@ async def music(self):
     print("Connected to voice channel!")
 
     asyncio.ensure_future(self.play_music())
+    asyncio.ensure_future(self.flash_music_embed())
+
+
+async def stop_music(self):
+    await self.songEmbedMessage.delete()
+    self.songEmbedMessage = None
+
+    self.voice.stop()
+
+
+async def flash_music_embed(self):
+    while True:
+        if self.songEmbedMessage:
+            embed = self.songEmbedMessage.embeds[0]
+            if embed.color.value == 0x3f9137:
+                color = 0xff0000
+            else:
+                color = 0x3f9137
+            #print("color", color)
+            embed = discord.Embed(title=embed.title, description=embed.description, color=color)
+            await self.songEmbedMessage.edit(embed=embed)
+        await asyncio.sleep(5)
 
 
 async def play_music(self):
@@ -81,26 +105,27 @@ async def play_music(self):
                 url = song[1].strip()
                 if url == "":
                     continue
-                print(url)
-                print(repr(url))
-                os.chdir("./temp")
+                os.chdir(r"D:\Users\willi\Documents\GitHub\discordbot\temp")
 
                 try:
                     source, data = await YTDLSource.from_url(url, loop=False, stream=False)
                     self.voice.play(source)
                     self.songsPlayed += 1
-                    os.chdir(os.pardir)
                     
-                    title = "🎅🎄  Now playing  ☃️🔥"
-                    print(data['title'])
-                    description = f"[{data['title']}]({url})"
+                    title = "🎅🎄 Now playing  ⛄🔥"
+                    description = f"[{data['title']}]({url}) ({time.strftime('%M:%S', time.gmtime(data['duration'])) })"
                     color = 0xff0000 if self.songsPlayed % 2 else 0x3f9137
-                    musicEmbed = discord.Embed(title=title, description=description, color=color)
-                    await self.musicChannel.send(embed=musicEmbed)
+                    self.musicEmbed = discord.Embed(title=title, description=description, color=color)
 
+                    if self.songEmbedMessage:
+                        await self.songEmbedMessage.delete()
+                    self.songEmbedMessage = await self.musicChannel.send(embed=self.musicEmbed)
+
+                    os.chdir(r"D:\Users\willi\Documents\GitHub\discordbot")
                     break
 
                 except:
-                    os.chdir(os.pardir)
+                    print(song)
+                    os.chdir(r"D:\Users\willi\Documents\GitHub\discordbot")
 
-        await asyncio.sleep(10)
+        await asyncio.sleep(1)

@@ -54,5 +54,9 @@
   {
     "regex": "^indeed$",
     "reactions": ["⏺", "🇨", "🇴", "🇲"]
+  },
+  {
+    "regex": "(christmas)|(xmas)",
+    "reactions": ["🎄", "🎅", "⛄"]
   }
 ]

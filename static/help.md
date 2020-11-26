@@ -6,6 +6,9 @@ Prefix: <prefix>
 `\help`
 Brings up this help text :)
 
+`\skip`
+Skips the current song/piece.
+
 `\t`
 Brings up a new trivia question in <#762173542233407528>. This command only works in <#762173542233407528>.
 

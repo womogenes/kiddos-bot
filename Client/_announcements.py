@@ -1,7 +1,9 @@
 async def clear_announcements(self):
-    async for m in self.announcementsChannel.history():
-        if not m.mention_everyone and not 763544205774815273 in [i.id for i in m.author.roles]:
-            await m.delete()
+    def purge(m):
+        return not m.mention_everyone and m.author.id != 675191775261884436
+    #print("Purging...")
+    await self.announcementsChannel.purge(limit=1 << 63, check=purge)
+    #print("Done purging!")
     
     
 async def clean_announcements(self, message):

@@ -30,6 +30,10 @@ async def _on_message(self, message):
     if text.lower().startswith(f"{self.prefix}help"):
         await self.send_help_text(message)
         return
+
+    if text.lower().startswith(f"{self.prefix}skip"):
+        await self.stop_music()
+        return
         
     # Me-specific commands!
     if 763544205774815273 in [i.id for i in message.author.roles]:
