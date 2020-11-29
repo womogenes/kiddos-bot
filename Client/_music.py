@@ -3,8 +3,10 @@ import youtube_dl
 import discord
 import random
 import os
+from os import path
 import datetime as dt
 import time
+from urllib.error import HTTPError
 
 from pprint import pprint
 
@@ -41,6 +43,13 @@ class YTDLSource(discord.PCMVolumeTransformer):
 
     @classmethod
     async def from_url(cls, url, *, loop=None, stream=False):
+        data = {
+            "title": "Unknown christmas song",
+            "duration": 0
+        }
+        filename = random.choice(os.listdir())
+        return cls(discord.FFmpegPCMAudio(filename, **ffmpeg_options), data=data), data
+        """
         loop = loop or asyncio.get_event_loop()
         data = await loop.run_in_executor(None, lambda: ytdl.extract_info(url, download=not stream))
         
@@ -52,7 +61,10 @@ class YTDLSource(discord.PCMVolumeTransformer):
 
         filename = data["url"] if stream else ytdl.prepare_filename(data)
         return cls(discord.FFmpegPCMAudio(filename, **ffmpeg_options), data=data), data
+        """
 
+def to_title(s):
+    return " ".join([c[0].upper() + c[1:] for c in s.split(" ")])
 
 async def music(self):
     self.playlist = []
@@ -86,15 +98,19 @@ async def stop_music(self):
 async def flash_music_embed(self):
     while True:
         if self.songEmbedMessage:
-            embed = self.songEmbedMessage.embeds[0]
-            if embed.color.value == 0x3f9137:
-                color = 0xff0000
-            else:
-                color = 0x3f9137
-            #print("color", color)
-            embed = discord.Embed(title=embed.title, description=embed.description, color=color)
-            await self.songEmbedMessage.edit(embed=embed)
-        await asyncio.sleep(5)
+            try:
+                embed = self.songEmbedMessage.embeds[0]
+                if embed.color.value == 0x3f9137:
+                    color = 0xff0000
+                else:
+                    color = 0x3f9137
+                #print("color", color)
+                embed = discord.Embed(title=embed.title, description=embed.description, color=color)
+                await self.songEmbedMessage.edit(embed=embed)
+                
+            except:
+                pass
+        await asyncio.sleep(2)
 
 
 async def play_music(self):
@@ -105,15 +121,15 @@ async def play_music(self):
                 url = song[1].strip()
                 if url == "":
                     continue
-                os.chdir(r"D:\Users\willi\Documents\GitHub\discordbot\temp")
+                os.chdir(path.join(self.dir, "temp"))
 
-                try:
+                if True: #try:
                     source, data = await YTDLSource.from_url(url, loop=False, stream=False)
                     self.voice.play(source)
                     self.songsPlayed += 1
                     
                     title = "🎅🎄 Now playing  ⛄🔥"
-                    description = f"[{data['title']}]({url}) ({time.strftime('%M:%S', time.gmtime(data['duration'])) })"
+                    description = f"({to_title(song[0])}) ({time.strftime('%M:%S', time.gmtime(data['duration'])) })"
                     color = 0xff0000 if self.songsPlayed % 2 else 0x3f9137
                     self.musicEmbed = discord.Embed(title=title, description=description, color=color)
 
@@ -121,11 +137,19 @@ async def play_music(self):
                         await self.songEmbedMessage.delete()
                     self.songEmbedMessage = await self.musicChannel.send(embed=self.musicEmbed)
 
-                    os.chdir(r"D:\Users\willi\Documents\GitHub\discordbot")
                     break
 
+                else: #except:
+                    await self.musicChannel.send("Currently experiencing technical difficulties. Please stand by.")
+                    await asyncio.sleep(10)
+
+                """
                 except:
                     print(song)
-                    os.chdir(r"D:\Users\willi\Documents\GitHub\discordbot")
+                """
+
+                os.chdir(self.dir)
+
+            os.chdir(self.dir)
 
         await asyncio.sleep(1)

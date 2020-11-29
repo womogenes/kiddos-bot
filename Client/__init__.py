@@ -52,6 +52,7 @@ class Client(discord.Client):
         
         self.prefix = "\\"
         self.helpEmbed = None
+        self.dir = os.getcwd()
         
         self.questionCache = []
         
