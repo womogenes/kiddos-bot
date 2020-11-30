@@ -33,6 +33,7 @@ class Client(discord.Client):
     from ._databasing import get_attrib
     from ._announcements import clean_announcements, clear_announcements
     from ._music import music, play_music, stop_music, flash_music_embed
+    from ._reddit import post_pictures, login_reddit
     
     def initialize(self):
         with open("./static/mongo-info.json") as fin:
@@ -70,6 +71,7 @@ class Client(discord.Client):
         self.leaderboardChannel = self.get_channel(763825477533302856)
         self.announcementsChannel = self.get_channel(774135689163440188)
         self.musicChannel = self.get_channel(761339710022746157)
+        self.redditChannel = self.get_channel(782335798661742632)
         self.userCache = {}
         
         self.lbMessages = [767193706590765096, 767193709476446209, 767193712387293245]

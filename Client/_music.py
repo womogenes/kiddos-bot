@@ -43,6 +43,7 @@ class YTDLSource(discord.PCMVolumeTransformer):
 
     @classmethod
     async def from_url(cls, url, *, loop=None, stream=False):
+        #"""
         data = {
             "title": "Unknown christmas song",
             "duration": 0
@@ -107,9 +108,10 @@ async def flash_music_embed(self):
                 #print("color", color)
                 embed = discord.Embed(title=embed.title, description=embed.description, color=color)
                 await self.songEmbedMessage.edit(embed=embed)
-                
+
             except:
                 pass
+
         await asyncio.sleep(2)
 
 
@@ -123,13 +125,13 @@ async def play_music(self):
                     continue
                 os.chdir(path.join(self.dir, "temp"))
 
-                if True: #try:
+                try:
                     source, data = await YTDLSource.from_url(url, loop=False, stream=False)
                     self.voice.play(source)
                     self.songsPlayed += 1
                     
                     title = "🎅🎄 Now playing  ⛄🔥"
-                    description = f"({to_title(song[0])}) ({time.strftime('%M:%S', time.gmtime(data['duration'])) })"
+                    description = f"({to_title(data['title'])}) ({time.strftime('%M:%S', time.gmtime(data['duration'])) })"
                     color = 0xff0000 if self.songsPlayed % 2 else 0x3f9137
                     self.musicEmbed = discord.Embed(title=title, description=description, color=color)
 
@@ -138,15 +140,18 @@ async def play_music(self):
                     self.songEmbedMessage = await self.musicChannel.send(embed=self.musicEmbed)
 
                     break
+                
+                except HTTPError as error:
+                    print("eeeeeeeeeeeeeeeeeerror", error)
+                    print("rrrrrrrrrrrrrrrrraw", error.raw)
+                    pass
 
-                else: #except:
-                    await self.musicChannel.send("Currently experiencing technical difficulties. Please stand by.")
-                    await asyncio.sleep(10)
-
-                """
-                except:
-                    print(song)
-                """
+                except youtube_dl.utils.DownloadError as error:
+                    print("#ERROR")
+                    print(error)
+                    print("#ERROR")
+                    help(error)
+                    pass
 
                 os.chdir(self.dir)
 

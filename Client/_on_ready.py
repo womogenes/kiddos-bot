@@ -19,5 +19,7 @@ async def on_ready(self):
 
     await self.music()
 
+    self.login_reddit()
+
     self.on_message = self._on_message
     print("Ready!")
