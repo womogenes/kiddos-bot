@@ -39,6 +39,7 @@ class Client(discord.Client):
         with open("./static/mongo-info.json") as fin:
             mongoInfo = json.load(fin)
             url = f"mongodb+srv://womogenes:{mongoInfo['password']}@cluster0.w4adg.mongodb.net/{mongoInfo['dbname']}?retryWrites=true&w=majority"
+            print(url)
             self.db = MongoClient(url).main
             print("Established MongoDB connection!")
         

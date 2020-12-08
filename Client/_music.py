@@ -43,14 +43,6 @@ class YTDLSource(discord.PCMVolumeTransformer):
 
     @classmethod
     async def from_url(cls, url, *, loop=None, stream=False):
-        #"""
-        data = {
-            "title": "Unknown christmas song",
-            "duration": 0
-        }
-        filename = random.choice(os.listdir())
-        return cls(discord.FFmpegPCMAudio(filename, **ffmpeg_options), data=data), data
-        """
         loop = loop or asyncio.get_event_loop()
         data = await loop.run_in_executor(None, lambda: ytdl.extract_info(url, download=not stream))
         
@@ -62,7 +54,6 @@ class YTDLSource(discord.PCMVolumeTransformer):
 
         filename = data["url"] if stream else ytdl.prepare_filename(data)
         return cls(discord.FFmpegPCMAudio(filename, **ffmpeg_options), data=data), data
-        """
 
 def to_title(s):
     return " ".join([c[0].upper() + c[1:] for c in s.split(" ")])
@@ -117,6 +108,18 @@ async def flash_music_embed(self):
 
 async def play_music(self):
     while True:
+        """
+        if not self.voice.is_connected():
+            try:
+                self.voice = await self.vc.connect()
+            except:
+                pass
+        """
+        if not self.voice.is_connected():
+            print("Not connected, reconnecting...")
+            await self.voice.connect(timeout=60, reconnect=True)
+            print("Reconnected!")
+
         if not self.voice.is_playing():
             while True:
                 song = random.choice(self.playlist)
@@ -131,7 +134,7 @@ async def play_music(self):
                     self.songsPlayed += 1
                     
                     title = "🎅🎄 Now playing  ⛄🔥"
-                    description = f"({to_title(data['title'])}) ({time.strftime('%M:%S', time.gmtime(data['duration'])) })"
+                    description = f"[{data['title']}]({url}) ({time.strftime('%M:%S', time.gmtime(data['duration'])) })"
                     color = 0xff0000 if self.songsPlayed % 2 else 0x3f9137
                     self.musicEmbed = discord.Embed(title=title, description=description, color=color)
 
@@ -144,14 +147,17 @@ async def play_music(self):
                 except HTTPError as error:
                     print("eeeeeeeeeeeeeeeeeerror", error)
                     print("rrrrrrrrrrrrrrrrraw", error.raw)
-                    pass
+                    await self.musicChannel.send("Technical difficulties, retrying in a minute.")
+                    await asyncio.sleep(60 * 10)
 
                 except youtube_dl.utils.DownloadError as error:
+                    print("song:", song)
+                    print("url:", url)
                     print("#ERROR")
                     print(error)
                     print("#ERROR")
-                    help(error)
-                    pass
+                    await self.musicChannel.send("Technical difficulties, retrying in a minute.")
+                    await asyncio.sleep(60 * 10)
 
                 os.chdir(self.dir)
 
