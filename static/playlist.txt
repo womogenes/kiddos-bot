@@ -5,7 +5,7 @@ Caroling caroling	https://www.youtube.com/watch?v=kFSPGIHjak8
 Charlie brown (Christmas time is here)	
 deck the halls	https://www.youtube.com/watch?v=WgEVI8DEkF8
 feliz navidad	https://www.youtube.com/watch?v=ihW56Xa3XGQ
-Frosty the snowman	https://www.youtube.com/watch?v=SDNcJL90Y9As
+Frosty the snowman	https://www.youtube.com/watch?v=SDNcJL90Y9A
 Happy holidays	https://www.youtube.com/watch?v=RlngQQtFw74
 Have yourself a merry little christmas	https://www.youtube.com/watch?v=pvA7-EjaSPI
 Holly jolly christmas	https://www.youtube.com/watch?v=P_dI6fVZwd0
@@ -35,3 +35,6 @@ White christmas	https://www.youtube.com/watch?v=w9QLn7gM-hY
 Winter wonderland	https://www.youtube.com/watch?v=oIKt5p3UmXg
 Wonderful Christmastime	https://www.youtube.com/watch?v=94Ye-3C1FC8
 Carol of the bells	https://www.youtube.com/watch?v=EfZBnMIih_M
+Deck the halls (Mannheim Steamroller)	https://www.youtube.com/watch?v=fEHzYjuf5NA
+Happy Xmas (War is over)	https://www.youtube.com/watch?v=flA5ndOyZbI
+Jingle bell rock (BFDI)	https://www.youtube.com/watch?v=ytGnd-1Ztjk

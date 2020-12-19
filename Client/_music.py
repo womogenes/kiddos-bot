@@ -7,6 +7,7 @@ from os import path
 import datetime as dt
 import time
 from urllib.error import HTTPError
+import subprocess
 
 from pprint import pprint
 
@@ -43,6 +44,22 @@ class YTDLSource(discord.PCMVolumeTransformer):
 
     @classmethod
     async def from_url(cls, url, *, loop=None, stream=False):
+        def get_length(input_video):
+            result = subprocess.run(["ffprobe", "-v", "error", "-show_entries", "format=duration", "-of", "default=noprint_wrappers=1:nokey=1", input_video], stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+            return float(result.stdout)
+
+        videoID = url[url.index("v=") + 2:]
+        filename = ""
+        for name in os.listdir():
+            if videoID in name:
+                filename = name
+
+                break
+
+        if filename == "":
+            return None
+
+        """
         loop = loop or asyncio.get_event_loop()
         data = await loop.run_in_executor(None, lambda: ytdl.extract_info(url, download=not stream))
         
@@ -53,7 +70,12 @@ class YTDLSource(discord.PCMVolumeTransformer):
         #pprint(data)
 
         filename = data["url"] if stream else ytdl.prepare_filename(data)
+        """
+        data = {
+            'duration': get_length(filename)
+        }
         return cls(discord.FFmpegPCMAudio(filename, **ffmpeg_options), data=data), data
+
 
 def to_title(s):
     return " ".join([c[0].upper() + c[1:] for c in s.split(" ")])
@@ -122,19 +144,24 @@ async def play_music(self):
 
         if not self.voice.is_playing():
             while True:
-                song = random.choice(self.playlist)
-                url = song[1].strip()
-                if url == "":
-                    continue
                 os.chdir(path.join(self.dir, "temp"))
 
                 try:
-                    source, data = await YTDLSource.from_url(url, loop=False, stream=False)
+                    x = None
+                    while not x:
+                        song = random.choice(self.playlist)
+                        url = song[1].strip()
+                        if url == "":
+                            continue
+                        x = await YTDLSource.from_url(url, loop=False, stream=False)
+                        print(x, random.randrange(1, 10))
+                        
+                    source, data = x
                     self.voice.play(source)
                     self.songsPlayed += 1
                     
                     title = "🎅🎄 Now playing  ⛄🔥"
-                    description = f"[{data['title']}]({url}) ({time.strftime('%M:%S', time.gmtime(data['duration'])) })"
+                    description = f"[{to_title(song[0])}]({url}) ({time.strftime('%M:%S', time.gmtime(data['duration'])) })"
                     color = 0xff0000 if self.songsPlayed % 2 else 0x3f9137
                     self.musicEmbed = discord.Embed(title=title, description=description, color=color)
 
