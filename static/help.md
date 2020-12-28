@@ -30,3 +30,6 @@ Only <@&763544205774815273> can do this.
 
 `\reward <person> <amount>`
 Only <@&763544205774815273> can do this.
+
+`\purge <amount>`
+Only works in <#774135689163440188>. Purges `<amount>` messages in <#774135689163440188>. Only <@&763544205774815273> can do this.

@@ -48,6 +48,9 @@ async def _on_message(self, message):
         if text.lower().startswith(f"{self.prefix}reward "):
             await self.reward(message)
             return
+
+        if channel.id == 774135689163440188 and text.lower().startswith(f"{self.prefix}purge "):
+            await self.clear_announcements(message)
     
     if await self.clean_leaderboard(message): return
     if await self.clean_announcements(message): return
