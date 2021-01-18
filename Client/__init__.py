@@ -33,7 +33,7 @@ class Client(discord.Client):
     from ._databasing import get_attrib
     from ._announcements import clean_announcements, clear_announcements
     from ._music import music, play_music, stop_music, flash_music_embed
-    from ._reddit import post_pictures, login_reddit
+    #from ._reddit import post_pictures, login_reddit
     
     def initialize(self):
         with open("./static/mongo-info.json") as fin:
