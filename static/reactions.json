@@ -20,8 +20,8 @@
     "reactions": [":noe:"]
   },
   {
-    "regex": "trump",
-    "reactions": ["🍊", ":orangeman:"]
+    "regex": "amanda",
+    "reactions": [":scary_amanda:"]
   },
   {
     "regex": "\\b(god|lord)\\b",
@@ -30,6 +30,14 @@
   {
     "regex": "(william)|(\\bbill\\b)",
     "reactions": [":william:"]
+  },
+  {
+    "regex": "minoo",
+    "reactions": [":minoo_reaction:"]
+  },
+  {
+    "regex": "max",
+    "reactions": [":maxsad:"]
   },
   {
     "regex": "billie",

@@ -23,7 +23,7 @@ Donate `<amount>` points to `<person>`.
  `<amount>` cannot exceed your total number of points and it must be a nonnegative integer. This command only works in <#762173542233407528>.
 
 `\kill`
-Only <@&763544205774815273> can do this.
+Only <@675191775261884436> can do this.
 
 `\commit <message>`
 Only <@&763544205774815273> can do this.
