@@ -57,3 +57,9 @@ async def _on_message(self, message):
     await self.react(message)
     #if await self.teehee(message): return
     if await self.ping(message): return
+
+
+    # Spellcheck last of all because it is
+    if channel.id == 807455198480957500:
+        await self.spellcheck(message)
+        return

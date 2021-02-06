@@ -34,6 +34,7 @@ class Client(discord.Client):
     from ._announcements import clean_announcements, clear_announcements
     from ._music import music, play_music, stop_music, flash_music_embed
     #from ._reddit import post_pictures, login_reddit
+    from ._spellcheck import spellcheck
     
     def initialize(self):
         with open("./static/mongo-info.json") as fin:
