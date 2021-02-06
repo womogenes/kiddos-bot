@@ -8,17 +8,20 @@ async def spellcheck(self, message):
 
     misspellings = list(checker.unknown(wordlist))
 
-    if misspellings:
-        amount = len(misspellings)
+    fixed = {}
+    for m in misspellings:
+        corrected = checker.correction(m)
+        fixed[m] = corrected
+
+    if len(fixed) > 0:
+        amount = len(fixed)
         text = f"Oh no, **{message.author.display_name}**! You misspelled **{amount}** {'word' if amount == 1 else 'words'}. Here are your mistakes:"
 
-        print(misspellings)
-
-        for i in range(amount):
-            if not misspellings[i]:
-                continue
-
-            text += "\n"
-            text += f"    {i + 1}. You said **{misspellings[i]}**; did you mean **{checker.correction(misspellings[i])}** instead?"
+        for i, wrong_word in enumerate(fixed):
+            text += f"\n    {i + 1}. "
+            if wrong_word == fixed[wrong_word]:
+                text += f"You said **{wrong_word}**. I didn't find any good corrections for that."
+            else:
+                text += f"You said **{wrong_word}**. did you mean **{fixed[wrong_word]}** instead?"
 
         await message.channel.send(text)
