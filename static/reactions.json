@@ -33,11 +33,11 @@
   },
   {
     "regex": "minoo",
-    "reactions": [":minoo_reaction:"]
+    "reactions": [":minoo_reaction:", ":minoo_reaction_2:"]
   },
   {
     "regex": "max",
-    "reactions": [":maxsad:"]
+    "reactions": [":max_reaction:", ":seesawsad:"]
   },
   {
     "regex": "billie",
@@ -76,7 +76,20 @@
     "reactions": ["🇲"]
   },
   {
-    "user": -385607852372262913,
+    "user": 385607852372262913,
     "reactions": ["🇨"]
+  },
+  {
+    "user": -675191775261884436,
+    "reactions": [
+      "🇱", "🇴", "🇻", "🇪",
+      "🥰", "😍", "😘", "😚", "😻", "💋", "💖", "💘", "❤️", "🌹"
+    ]
+  },
+  {
+    "user": -759104694072639568,
+    "reactions": [
+      "💖", "💘", "😘"
+    ]
   }
 ]
