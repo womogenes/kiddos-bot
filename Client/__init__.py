@@ -37,6 +37,7 @@ class Client(discord.Client):
     from ._spellcheck import spellcheck
     from ._random_reaction import random_reaction
     from ._jokes import tell_joke
+    from ._jokes import tell_punchline
     from ._raw_reaction_add import on_raw_reaction_add
     
     def initialize(self):
@@ -80,3 +81,5 @@ class Client(discord.Client):
         self.userCache = {}
         
         self.lbMessages = [767193706590765096, 767193709476446209, 767193712387293245]
+
+        self.punchlines = {}
