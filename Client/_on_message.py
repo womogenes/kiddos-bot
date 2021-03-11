@@ -57,7 +57,10 @@ async def _on_message(self, message):
     await self.react(message)
     #if await self.teehee(message): return
     if await self.ping(message): return
+    if await self.tell_joke(message): return
 
+    if str(dt.now().date()) == "2021-04-01":
+        await self.random_reaction(message)
 
     # Spellcheck last of all because it is
     if channel.id == 807455198480957500:
