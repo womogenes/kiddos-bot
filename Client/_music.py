@@ -48,6 +48,7 @@ class YTDLSource(discord.PCMVolumeTransformer):
             result = subprocess.run(["ffprobe", "-v", "error", "-show_entries", "format=duration", "-of", "default=noprint_wrappers=1:nokey=1", input_video], stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
             return float(result.stdout)
 
+        """
         videoID = url[url.index("v=") + 2:]
         filename = ""
         for name in os.listdir():
@@ -58,8 +59,9 @@ class YTDLSource(discord.PCMVolumeTransformer):
 
         if filename == "":
             return None
-
         """
+
+        #"""
         loop = loop or asyncio.get_event_loop()
         data = await loop.run_in_executor(None, lambda: ytdl.extract_info(url, download=not stream))
         
@@ -67,13 +69,11 @@ class YTDLSource(discord.PCMVolumeTransformer):
             # Take first item from a playlist
             data = data["entries"][0]
 
-        #pprint(data)
-
         filename = data["url"] if stream else ytdl.prepare_filename(data)
-        """
         data = {
             'duration': get_length(filename)
         }
+        #"""
         return cls(discord.FFmpegPCMAudio(filename, **ffmpeg_options), data=data), data
 
 
@@ -91,7 +91,7 @@ async def music(self):
                 self.playlist.append(k)
             x = fin.readline()
 
-    self.vc = self.get_channel(764193661461200926)
+    self.vc = self.get_channel(768985179473444925)
     self.voice = await self.vc.connect()
 
     await self.guilds[0].change_voice_state(channel=self.vc, self_deaf=True)

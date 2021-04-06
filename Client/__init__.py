@@ -39,6 +39,7 @@ class Client(discord.Client):
     from ._jokes import tell_joke
     from ._jokes import tell_punchline
     from ._raw_reaction_add import on_raw_reaction_add
+    from ._april_fools import april_fools
     
     def initialize(self):
         with open("./static/mongo-info.json") as fin:
@@ -54,8 +55,7 @@ class Client(discord.Client):
         if dt.now().weekday() == 0 and dt.strptime(next(self.db.dateInfo.find({}))["last-reset-weekly-points"], "%Y-%m-%d %H:%M:%S.%f").date() != dt.now().date():
             self.db.users.update_many({}, {"$set": {"weekly": 0}})
             self.db.dateInfo.update_one({}, {"$set": {"last-reset-weekly-points": str(dt.now())}})
-            print("Weekly point reset finished.")
-        
+            print("Weekly point reset finished.")        
         
         self.prefix = "\\"
         self.helpEmbed = None
@@ -72,6 +72,7 @@ class Client(discord.Client):
         self.songsPlayed = 0
         self.songEmbedMessage = None
         
+        self.generalChannel = self.get_channel(761340147157041174)
         self.botChannel = self.get_channel(762173542233407528)
         self.quoteChannel = self.get_channel(761340228450910250)
         self.leaderboardChannel = self.get_channel(763825477533302856)

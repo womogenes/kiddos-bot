@@ -1,4 +1,5 @@
 from datetime import datetime as dt
+import random
 
 async def _on_message(self, message):
     clippedMessage = message.content if len(message.content) < 32 else message.content[:32]
@@ -51,6 +52,10 @@ async def _on_message(self, message):
 
         if channel.id == 774135689163440188 and text.lower().startswith(f"{self.prefix}purge "):
             await self.clear_announcements(message)
+
+        if str(dt.now().date()) == "2021-04-01" and text.lower().startswith("let the fun begin!"):
+            await message.channel.send("hehehehe")
+            await self.april_fools()
     
     if await self.clean_leaderboard(message): return
     if await self.clean_announcements(message): return
@@ -59,7 +64,7 @@ async def _on_message(self, message):
     if await self.ping(message): return
     if await self.tell_joke(message): return
 
-    if str(dt.now().date()) == "2021-04-01":
+    if str(dt.now().date()) == "2021-04-01" and random.randrange(10) < 1:
         await self.random_reaction(message)
 
     # Spellcheck last of all because it is
