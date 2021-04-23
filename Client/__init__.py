@@ -40,6 +40,8 @@ class Client(discord.Client):
     from ._jokes import tell_punchline
     from ._raw_reaction_add import on_raw_reaction_add
     from ._april_fools import april_fools
+    from ._gratitude import gratitude_reminder, send_reminder
+    from ._religion import fsm_picture
     
     def initialize(self):
         with open("./static/mongo-info.json") as fin:
@@ -79,6 +81,7 @@ class Client(discord.Client):
         self.announcementsChannel = self.get_channel(774135689163440188)
         self.musicChannel = self.get_channel(761339710022746157)
         self.redditChannel = self.get_channel(782335798661742632)
+        self.gratitudeChannel = self.get_channel(814673435229290527)
         self.userCache = {}
         
         self.lbMessages = [767193706590765096, 767193709476446209, 767193712387293245]

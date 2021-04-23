@@ -154,7 +154,6 @@ async def play_music(self):
                         if url == "":
                             continue
                         x = await YTDLSource.from_url(url, loop=False, stream=False)
-                        print(x, random.randrange(1, 10))
                         
                     source, data = x
                     self.voice.play(source)

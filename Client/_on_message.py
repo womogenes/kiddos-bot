@@ -37,7 +37,7 @@ async def _on_message(self, message):
         return
         
     # Me-specific commands!
-    if 763544205774815273 in [i.id for i in message.author.roles]:
+    if 827572050356731924 in [i.id for i in message.author.roles]:
         if text.lower() == f"{self.prefix}kill":
             await self.logout(message)
             return
@@ -56,6 +56,9 @@ async def _on_message(self, message):
         if str(dt.now().date()) == "2021-04-01" and text.lower().startswith("let the fun begin!"):
             await message.channel.send("hehehehe")
             await self.april_fools()
+
+        if message.content == "woop woooop":
+            await self.gratitude_reminder()
     
     if await self.clean_leaderboard(message): return
     if await self.clean_announcements(message): return
@@ -63,6 +66,7 @@ async def _on_message(self, message):
     #if await self.teehee(message): return
     if await self.ping(message): return
     if await self.tell_joke(message): return
+    if await self.fsm_picture(message): return
 
     if str(dt.now().date()) == "2021-04-01" and random.randrange(10) < 1:
         await self.random_reaction(message)
