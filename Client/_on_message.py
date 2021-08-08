@@ -1,5 +1,6 @@
 from datetime import datetime as dt
 import random
+import time
 
 async def _on_message(self, message):
     clippedMessage = message.content if len(message.content) < 32 else message.content[:32]

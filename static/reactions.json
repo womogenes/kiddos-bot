@@ -20,6 +20,10 @@
     "reactions": [":noe:"]
   },
   {
+    "regex": "bynum",
+    "reactions": [":bynum:"]
+  },
+  {
     "regex": "amanda",
     "reactions": [":scary_amanda:"]
   },
@@ -72,12 +76,20 @@
     "reactions": ["🐶", "🐕", "🐩", "🐕‍🦺"]
   },
   {
+    "regex": "(cat)|(kitty)",
+    "reactions": ["🐈", "😻"]
+  },
+  {
     "user": -722965611012948018,
     "reactions": [""]
   },
   {
     "user": 385607852372262913,
     "reactions": ["🇨"]
+  },
+  {
+    "user": -702180164397957181,
+    "reactions": ["🙏", "🙇"]
   },
   {
     "user": -675191775261884436,
