@@ -5,6 +5,7 @@ from discord.utils import get
 with open("./static/reactions.json", encoding="utf-8") as fin:
     reactions = json.load(fin)
 
+
 async def react(self, message):
     for i in reactions:
         if "regex" in i:

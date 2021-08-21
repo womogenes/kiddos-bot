@@ -17,8 +17,9 @@ from pprint import pprint
 from html import unescape
 from tabulate import tabulate
 
+
 class Client(discord.Client):
-    
+
     from ._on_ready import on_ready
     from ._on_message import _on_message
     from ._send_quote import send_quote
@@ -42,7 +43,7 @@ class Client(discord.Client):
     from ._april_fools import april_fools
     from ._gratitude import gratitude_reminder, send_reminder
     from ._religion import fsm_picture
-    
+
     def initialize(self):
         with open("./static/mongo-info.json") as fin:
             mongoInfo = json.load(fin)
@@ -50,21 +51,23 @@ class Client(discord.Client):
             print(url)
             self.db = MongoClient(url).main
             print("Established MongoDB connection!")
-        
-        self.lastSent = dt.strptime(next(self.db.dateInfo.find({}))["last-sent-quote"], "%Y-%m-%d %H:%M:%S.%f")
-        
+
+        self.lastSent = dt.strptime(next(self.db.dateInfo.find({}))[
+                                    "last-sent-quote"], "%Y-%m-%d %H:%M:%S.%f")
+
         # Reset weekly points on a ?day.
         if dt.now().weekday() == 0 and dt.strptime(next(self.db.dateInfo.find({}))["last-reset-weekly-points"], "%Y-%m-%d %H:%M:%S.%f").date() != dt.now().date():
             self.db.users.update_many({}, {"$set": {"weekly": 0}})
-            self.db.dateInfo.update_one({}, {"$set": {"last-reset-weekly-points": str(dt.now())}})
-            print("Weekly point reset finished.")        
-        
+            self.db.dateInfo.update_one(
+                {}, {"$set": {"last-reset-weekly-points": str(dt.now())}})
+            print("Weekly point reset finished.")
+
         self.prefix = "\\"
         self.helpEmbed = None
         self.dir = os.getcwd()
-        
+
         self.questionCache = []
-        
+
         self.question = None
         self.answers = None
         self.rightAnswer = None
@@ -73,7 +76,7 @@ class Client(discord.Client):
         self.lastUpdatedLeaderboard = 0
         self.songsPlayed = 0
         self.songEmbedMessage = None
-        
+
         self.generalChannel = self.get_channel(761340147157041174)
         self.botChannel = self.get_channel(762173542233407528)
         self.quoteChannel = self.get_channel(761340228450910250)
@@ -83,7 +86,8 @@ class Client(discord.Client):
         self.redditChannel = self.get_channel(782335798661742632)
         self.gratitudeChannel = self.get_channel(814673435229290527)
         self.userCache = {}
-        
-        self.lbMessages = [767193706590765096, 767193709476446209, 767193712387293245]
+
+        self.lbMessages = [767193706590765096,
+                           767193709476446209, 767193712387293245]
 
         self.punchlines = {}

@@ -2,6 +2,7 @@ import re
 from spellchecker import SpellChecker
 checker = SpellChecker()
 
+
 async def spellcheck(self, message):
     wordlist = re.sub("[^\w\s]", "", message.content).strip().split(" ")
     wordlist = filter(lambda x: len(x) > 0, wordlist)

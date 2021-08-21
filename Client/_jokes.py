@@ -1,8 +1,10 @@
 import requests
 
+
 async def tell_joke(self, message):
     if "joke" in message.content:
-        joke = requests.get("https://official-joke-api.appspot.com/random_joke")
+        joke = requests.get(
+            "https://official-joke-api.appspot.com/random_joke")
         json = joke.json()
         text = f"**{json['setup']}**"
         message = await message.channel.send(text)

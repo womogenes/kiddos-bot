@@ -1,6 +1,7 @@
 import asyncio
 import discord
 
+
 async def fetch_user(self, idx):
     if idx in self.userCache:
         return self.userCache[idx]

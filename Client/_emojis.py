@@ -48,7 +48,8 @@ EMOJI_RANGES_UNICODE = {
 
 NO_NAME_ERROR = '(No name found for this codepoint)'
 
-def random_emoji(unicode_version = 6):
+
+def random_emoji(unicode_version=6):
     if unicode_version in EMOJI_RANGES_UNICODE:
         emoji_ranges = EMOJI_RANGES_UNICODE[unicode_version]
     else:

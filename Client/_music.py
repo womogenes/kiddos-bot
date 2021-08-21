@@ -24,7 +24,7 @@ ytdl_format_options = {
     "quiet": True,
     "no_warnings": True,
     "default_search": "auto",
-    "source_address": "0.0.0.0" # bind to ipv4 since ipv6 addresses cause issues sometimes
+    "source_address": "0.0.0.0"  # bind to ipv4 since ipv6 addresses cause issues sometimes
 }
 
 ffmpeg_options = {
@@ -32,6 +32,7 @@ ffmpeg_options = {
 }
 
 ytdl = youtube_dl.YoutubeDL(ytdl_format_options)
+
 
 class YTDLSource(discord.PCMVolumeTransformer):
     def __init__(self, source, *, data, volume=0.5):
@@ -45,7 +46,8 @@ class YTDLSource(discord.PCMVolumeTransformer):
     @classmethod
     async def from_url(cls, url, *, loop=None, stream=False):
         def get_length(input_video):
-            result = subprocess.run(["ffprobe", "-v", "error", "-show_entries", "format=duration", "-of", "default=noprint_wrappers=1:nokey=1", input_video], stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+            result = subprocess.run(["ffprobe", "-v", "error", "-show_entries", "format=duration", "-of",
+                                    "default=noprint_wrappers=1:nokey=1", input_video], stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
             return float(result.stdout)
 
         """
@@ -61,10 +63,10 @@ class YTDLSource(discord.PCMVolumeTransformer):
             return None
         """
 
-        #"""
+        # """
         loop = loop or asyncio.get_event_loop()
         data = await loop.run_in_executor(None, lambda: ytdl.extract_info(url, download=not stream))
-        
+
         if "entries" in data:
             # Take first item from a playlist
             data = data["entries"][0]
@@ -73,17 +75,18 @@ class YTDLSource(discord.PCMVolumeTransformer):
         data = {
             'duration': get_length(filename)
         }
-        #"""
+        # """
         return cls(discord.FFmpegPCMAudio(filename, **ffmpeg_options), data=data), data
 
 
 def to_title(s):
     return " ".join([c[0].upper() + c[1:] for c in s.split(" ")])
 
+
 async def music(self):
     self.playlist = []
     with open("./static/playlist.txt") as fin:
-        fin.readline() # Header
+        fin.readline()  # Header
         x = fin.readline()
         while x:
             k = x.split("\t")
@@ -119,7 +122,8 @@ async def flash_music_embed(self):
                 else:
                     color = 0x3f9137
                 #print("color", color)
-                embed = discord.Embed(title=embed.title, description=embed.description, color=color)
+                embed = discord.Embed(
+                    title=embed.title, description=embed.description, color=color)
                 await self.songEmbedMessage.edit(embed=embed)
 
             except:
@@ -154,22 +158,23 @@ async def play_music(self):
                         if url == "":
                             continue
                         x = await YTDLSource.from_url(url, loop=False, stream=False)
-                        
+
                     source, data = x
                     self.voice.play(source)
                     self.songsPlayed += 1
-                    
+
                     title = "🎅🎄 Now playing  ⛄🔥"
                     description = f"[{to_title(song[0])}]({url}) ({time.strftime('%M:%S', time.gmtime(data['duration'])) })"
                     color = 0xff0000 if self.songsPlayed % 2 else 0x3f9137
-                    self.musicEmbed = discord.Embed(title=title, description=description, color=color)
+                    self.musicEmbed = discord.Embed(
+                        title=title, description=description, color=color)
 
                     if self.songEmbedMessage:
                         await self.songEmbedMessage.delete()
                     self.songEmbedMessage = await self.musicChannel.send(embed=self.musicEmbed)
 
                     break
-                
+
                 except HTTPError as error:
                     print("eeeeeeeeeeeeeeeeeerror", error)
                     print("rrrrrrrrrrrrrrrrraw", error.raw)
